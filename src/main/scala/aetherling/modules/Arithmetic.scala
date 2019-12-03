@@ -9,9 +9,9 @@ import chisel3._
   * @param t the Space-Time Int type (specifies width)
   */
 class Add(t: ST_Int) extends MultiIOModule with BinaryInterface with ValidInterface {
-  val in0 = IO(Input(t.chiselRepr()))
-  val in1 = IO(Input(t.chiselRepr()))
-  val out = IO(Output(t.chiselRepr()))
+  override val in0 = IO(Input(t.chiselRepr()))
+  override val in1 = IO(Input(t.chiselRepr()))
+  override val out = IO(Output(t.chiselRepr()))
   out := in0 + in1
   valid_down := valid_up
 }
@@ -21,8 +21,8 @@ class Add(t: ST_Int) extends MultiIOModule with BinaryInterface with ValidInterf
   * @param t the Space-Time Int type (specifies width)
   */
 class Abs(t: ST_Int) extends MultiIOModule with UnaryInterface with ValidInterface {
-  val in = IO(Input(t.chiselRepr()))
-  val out = IO(Output(t.chiselRepr()))
+  override val in = IO(Input(t.chiselRepr()))
+  override val out = IO(Output(t.chiselRepr()))
   when(in.asSInt() < 0.S) { out := 0.U - in }.otherwise( out := in )
   valid_down := valid_up
 }
