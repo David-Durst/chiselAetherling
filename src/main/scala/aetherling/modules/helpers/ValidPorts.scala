@@ -1,4 +1,4 @@
-package aetherling.modules
+package aetherling.modules.helpers
 
 import chisel3._
 

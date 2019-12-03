@@ -2,6 +2,7 @@ package aetherling.modules
 
 import java.io.File
 
+import aetherling.types.ST_Int
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
@@ -26,13 +27,13 @@ class AbsUnitTester(c: Abs) extends PeekPokeTester(c) {
 
 class ArithmeticTester extends ChiselFlatSpec {
   "Add" should "add two ints correctly" in {
-    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Add(8)) {
+    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Add(ST_Int(8))) {
       c => new AddUnitTester(c)
     } should be(true)
   }
 
   "Abs" should "take absolute value of an int correctly" in {
-    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Abs(8)) {
+    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Abs(ST_Int(8))) {
       c => new AbsUnitTester(c)
     } should be(true)
   }

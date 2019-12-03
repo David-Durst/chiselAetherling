@@ -182,7 +182,7 @@ case class ST_Int(width: Int) extends STTypeDefinition {
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): Data = UInt(width.W)
+  override def chiselRepr(): UInt = UInt(width.W)
 }
 
 case class ST_Bit() extends STTypeDefinition {
@@ -212,5 +212,5 @@ case class ST_Bit() extends STTypeDefinition {
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): Data = Bool()
+  override def chiselRepr(): Bool = Bool()
 }
