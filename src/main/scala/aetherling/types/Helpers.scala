@@ -9,7 +9,4 @@ class Helpers {
   def throughput[T <: STTypeDefinition](t: T): Int = t.length() / t.time()
 }
 
-abstract class TupleBundle extends Bundle {
-  val t0b: Data
-  val t1b: Data
-}
+class TupleBundle(val t0b: Data, val t1b: Data) extends Bundle

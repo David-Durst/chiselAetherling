@@ -149,10 +149,7 @@ case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): TupleBundle = new TupleBundle {
-    val t0b = t0.chiselRepr()
-    val t1b = t1.chiselRepr()
-  }
+  override def chiselRepr(): TupleBundle = new TupleBundle(t0.chiselRepr(), t1.chiselRepr())
 }
 
 case class STInt(width: Int) extends STTypeDefinition {
