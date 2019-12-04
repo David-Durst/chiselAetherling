@@ -6,7 +6,7 @@ import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester}
 import chisel3._
 
-class MapSAbsUnitTester(c: MapS[Abs]) extends PeekPokeTester(c) {
+class MapSAbsUnitTester(c: MapS) extends PeekPokeTester(c) {
   for(i <- -10 to 10 by 1) {
     for(j <- 0 to 3 by 1) {
       poke(c.in(j).asInstanceOf[UInt], BigInt(i*j))

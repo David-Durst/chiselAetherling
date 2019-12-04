@@ -3,7 +3,7 @@ package aetherling.modules.higherorder
 import aetherling.modules.helpers.{BinaryInterface, ValidInterface}
 import chisel3._
 
-class Map2T[T <: MultiIOModule with BinaryInterface with ValidInterface](t: => T)
+class Map2T(t: => MultiIOModule with BinaryInterface with ValidInterface)
   extends MultiIOModule with BinaryInterface with ValidInterface {
     val op = Module(t)
 

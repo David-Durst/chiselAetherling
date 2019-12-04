@@ -5,7 +5,7 @@ import aetherling.types.STInt
 import chisel3.{iotesters, _}
 import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester}
 
-class MapTAbsUnitTester(c: MapT[Abs]) extends PeekPokeTester(c) {
+class MapTAbsUnitTester(c: MapT) extends PeekPokeTester(c) {
   for(i <- -10 to 10 by 1) {
     poke(c.in.asInstanceOf[UInt], BigInt(i))
     //println(s"in: ${peek(c.io.in)}")
