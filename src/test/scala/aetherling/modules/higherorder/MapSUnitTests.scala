@@ -9,7 +9,7 @@ import chisel3._
 class MapSAbsUnitTester(c: MapS[Abs]) extends PeekPokeTester(c) {
   for(i <- -10 to 10 by 1) {
     for(j <- 0 to 3 by 1) {
-      poke(c.in(j).asInstanceOf[UInt], i*j)
+      poke(c.in(j).asInstanceOf[UInt], BigInt(i*j))
       //println(s"in: ${peek(c.io.in)}")
       //println(s"out: ${peek(c.io.out)}")
       expect(c.out(j).asInstanceOf[UInt], scala.math.abs(i*j))

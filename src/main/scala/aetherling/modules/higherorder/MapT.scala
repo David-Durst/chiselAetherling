@@ -7,8 +7,8 @@ class MapT[T <: MultiIOModule with UnaryInterface with ValidInterface](t: => T)
   extends MultiIOModule with UnaryInterface with ValidInterface {
     val op = Module(t)
 
-    override val in = IO(Input(op.in))
-    override val out = IO(Output(op.out))
+    override val in = IO(Input(chiselTypeOf(op.in)))
+    override val out = IO(Output(chiselTypeOf(op.out)))
 
     op.valid_up := valid_up
     op.in := in
