@@ -1,7 +1,7 @@
 package aetherling.modules.higherorder
 
 import aetherling.modules.Abs
-import aetherling.types.ST_Int
+import aetherling.types.STInt
 import chisel3.{iotesters, _}
 import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester}
 
@@ -16,7 +16,7 @@ class MapTAbsUnitTester(c: MapT[Abs]) extends PeekPokeTester(c) {
 
 class MapTTester extends ChiselFlatSpec {
   "MapT" should "take abs of four ints per clock correctly" in {
-    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new MapT(new Abs(ST_Int(8)))) {
+    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new MapT(new Abs(STInt(8)))) {
       c => new MapTAbsUnitTester(c)
     } should be(true)
   }

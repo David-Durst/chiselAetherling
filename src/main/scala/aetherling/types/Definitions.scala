@@ -121,7 +121,7 @@ case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinit
   override def chiselRepr(): Data = Vec(n, t.chiselRepr())
 }
 
-case class Atom_Tuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t1: T1)
+case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t1: T1)
   extends STTypeDefinition {
   /**
     * Total amount of atoms over the entire time of the ST type
@@ -149,13 +149,13 @@ case class Atom_Tuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t1
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): Data = new Bundle {
+  override def chiselRepr(): TupleBundle = new TupleBundle {
     val t0b = t0.chiselRepr()
     val t1b = t1.chiselRepr()
   }
 }
 
-case class ST_Int(width: Int) extends STTypeDefinition {
+case class STInt(width: Int) extends STTypeDefinition {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
@@ -185,7 +185,7 @@ case class ST_Int(width: Int) extends STTypeDefinition {
   override def chiselRepr(): UInt = UInt(width.W)
 }
 
-case class ST_Bit() extends STTypeDefinition {
+case class STBit() extends STTypeDefinition {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
