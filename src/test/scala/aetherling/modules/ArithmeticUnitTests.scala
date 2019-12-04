@@ -9,8 +9,7 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 class AddUnitTester(c: Add) extends PeekPokeTester(c) {
   for(i <- 1 to 40 by 3) {
     for (j <- 1 to 40 by 7) {
-      poke(c.in.t0b.asUInt(), BigInt(i))
-      poke(c.in.t1b.asUInt(), BigInt(j))
+      poke(c.in, Array(BigInt(i), BigInt(j)))
       expect(c.out, i + j)
     }
   }
