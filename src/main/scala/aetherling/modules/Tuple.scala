@@ -9,6 +9,6 @@ class AtomTuple(t0: STTypeDefinition, t1: STTypeDefinition) extends MultiIOModul
   override val in1 = IO(Input(t1.chiselRepr()))
   override val out = IO(Output(STAtomTuple(t0, t1).chiselRepr()))
   out.t0b := in0
-  out.t1b := in0
+  out.t1b := in1
   valid_down := valid_up
 }
