@@ -12,45 +12,52 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
    */
 
-  def poke_nested[TS, TT](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
+  def poke_nested[TS](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
     values(0) match {
-      case v: IndexedSeq[TT] =>
+      case v: IndexedSeq[_] =>
         signal.t0b match {
           case e: Aggregate => poke_nested(e, v)
           case e: TupleBundle => poke_nested(e, v)
           case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
         }
-      case v: Int => poke(signal.t0b.asUInt(), BigInt(v))
-      case v: BigInt => poke(signal.t0b.asUInt(), v)
+      case v: Int => poke_nested(signal.t0b, BigInt(v))
+      case v: BigInt => poke_nested(signal.t0b, v)
       case _ => throw new Exception(s"Cannot poke value ${signal.t0b.getClass.getName}")
     }
     values(1) match {
-      case v: IndexedSeq[TT] =>
+      case v: IndexedSeq[_] =>
         signal.t1b match {
           case e: Aggregate => poke_nested(e, v)
           case e: TupleBundle => poke_nested(e, v)
           case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
         }
-      case v: Int => poke(signal.t0b.asUInt(), BigInt(v))
-      case v: BigInt => poke(signal.t0b.asUInt(), v)
-      case _ => throw new Exception(s"Cannot poke value ${signal.t0b.getClass.getName}")
+      case v: Int => poke_nested(signal.t1b, BigInt(v))
+      case v: BigInt => poke_nested(signal.t1b, v)
+      case _ => throw new Exception(s"Cannot poke value ${signal.t1b.getClass.getName}")
     }
   }
 
-  def poke_nested[TS, TT](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
+  def poke_nested[TS](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
     (extractElementBits(signal) zip values.reverse).foreach{ case (elem, value) =>
       value match {
-        case v: IndexedSeq[TT] =>
+        case v: IndexedSeq[_] =>
           elem match {
             case e: Aggregate => poke_nested(e, v)
             case e: TupleBundle => poke_nested(e, v)
             case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
           }
-        case v: Int => poke(elem.asUInt(), BigInt(v))
-        case v: BigInt => poke(elem.asUInt(), v)
+        case v: Int => poke_nested(elem, v)
+        case v: BigInt => poke_nested(elem, v)
         case _ => throw new Exception(s"Cannot poke value ${elem.getClass.getName}")
       }
     }
+  }
+
+  def poke_nested(signal: Data, value: Int): Unit = {
+    (signal.asUInt(), BigInt(value))
+  }
+  def poke_nested(signal: Data, value: BigInt): Unit = {
+    (signal.asUInt(), value)
   }
 
  /*
