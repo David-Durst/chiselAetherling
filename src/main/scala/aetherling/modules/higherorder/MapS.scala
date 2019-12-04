@@ -8,8 +8,8 @@ class MapS[T <: MultiIOModule with UnaryInterface with ValidInterface](n: Int, t
   val ops = (0 to (n-1)).map(_ => Module(t))
   val fst_op = ops.head
 
-  override val in = IO(Input(Vec(n, fst_op.in)))
-  override val out = IO(Output(Vec(n, fst_op.out)))
+  override val in = IO(Input(Vec(n, chiselTypeOf(fst_op.in))))
+  override val out = IO(Output(Vec(n, chiselTypeOf(fst_op.out))))
 
   ops.zipWithIndex.foreach { case (op, i) =>
     op.valid_up := valid_up
