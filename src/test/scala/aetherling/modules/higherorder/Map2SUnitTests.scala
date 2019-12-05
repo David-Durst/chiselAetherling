@@ -14,7 +14,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def poke_nested[TS](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
     values(0) match {
-      case v: IndexedSeq[_] =>
+      case v: Array[_] =>
         signal.t0b match {
           case e: TupleBundle => poke_nested(e, v)
           case e: Aggregate => poke_nested(e, v)
@@ -25,7 +25,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case _ => throw new Exception(s"Cannot poke value ${signal.t0b.getClass.getName}")
     }
     values(1) match {
-      case v: IndexedSeq[_] =>
+      case v: Array[_] =>
         signal.t1b match {
           case e: TupleBundle => poke_nested(e, v)
           case e: Aggregate => poke_nested(e, v)
@@ -38,9 +38,9 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def poke_nested[TS](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
-    (extractElementBits(signal) zip values.reverse).foreach{ case (elem, value) =>
+    (signal.getElements zip values).foreach{ case (elem, value) =>
       value match {
-        case v: IndexedSeq[_] =>
+        case v: Array[_] =>
           elem match {
             case e: TupleBundle => poke_nested(e, v)
             case e: Aggregate => poke_nested(e, v)
@@ -70,6 +70,54 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
   */
 
+  def expect_nested[TS](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
+    values(0) match {
+      case v: Array[_] =>
+        signal.t0b match {
+          case e: TupleBundle => expect_nested(e, v)
+          case e: Aggregate => expect_nested(e, v)
+          case e => throw new Exception(s"Not a Vec or TupleBundle type trying to expect: $e")
+        }
+      case v: Int => expect_nested(signal.t0b, BigInt(v))
+      case v: BigInt => expect_nested(signal.t0b, v)
+      case _ => throw new Exception(s"Cannot expect value ${signal.t0b.getClass.getName}")
+    }
+    values(1) match {
+      case v: Array[_] =>
+        signal.t1b match {
+          case e: TupleBundle => expect_nested(e, v)
+          case e: Aggregate => expect_nested(e, v)
+          case e => throw new Exception(s"Not a Vec or TupleBundle type trying to expect: $e")
+        }
+      case v: Int => expect_nested(signal.t1b, BigInt(v))
+      case v: BigInt => expect_nested(signal.t1b, v)
+      case _ => throw new Exception(s"Cannot expect value ${signal.t1b.getClass.getName}")
+    }
+  }
+
+  def expect_nested[TS](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
+    (signal.getElements zip values).foreach{ case (elem, value) =>
+      value match {
+        case v: Array[_] =>
+          elem match {
+            case e: TupleBundle => expect_nested(e, v)
+            case e: Aggregate => expect_nested(e, v)
+            case e => throw new Exception(s"Not a Vec or TupleBundle type trying to expect: $e")
+          }
+        case v: Int => expect_nested(elem, v)
+        case v: BigInt => expect_nested(elem, v)
+        case _ => throw new Exception(s"Cannot expect value ${elem.getClass.getName}")
+      }
+    }
+  }
+
+  def expect_nested(signal: Data, value: Int): Unit = {
+    expect(signal.asUInt(), BigInt(value))
+  }
+  def expect_nested(signal: Data, value: BigInt): Unit = {
+    expect(signal.asUInt(), value)
+  }
+
   private def extractElementBits(signal: Data): IndexedSeq[Element] = {
     signal match {
       case elt: Aggregate => elt.getElements.toIndexedSeq flatMap {extractElementBits(_)}
@@ -86,13 +134,13 @@ class Map2STupleUnitTester(c: Map2S) extends NestedPeekPokeTester(c) {
       poke_nested(c.in1, (0 to 3).map(j => BigInt(i*j+17)))
       //println(s"in: ${peek(c.io.in)}")
       //println(s"out: ${peek(c.io.out)}")
-      //expect(c.out, (0 to 3).map(j => Array(i*j, i*j+17)))
+      expect_nested(c.out, (0 to 3).map(j => Array(i*j, i*j+17)))
     }
   }
 }
 
 class Map2STester extends ChiselFlatSpec {
-  "MapS" should "take abs of four ints per clock correctly" in {
+  "Map2S" should "take tuple 4 pairs of ints per clock" in {
     iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Map2S(4, new AtomTuple(STInt(8), STInt(8)))) {
       c => new Map2STupleUnitTester(c)
     } should be(true)
