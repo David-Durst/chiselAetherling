@@ -16,8 +16,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     values(0) match {
       case v: IndexedSeq[_] =>
         signal.t0b match {
-          case e: Aggregate => poke_nested(e, v)
           case e: TupleBundle => poke_nested(e, v)
+          case e: Aggregate => poke_nested(e, v)
           case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
         }
       case v: Int => poke_nested(signal.t0b, BigInt(v))
@@ -27,8 +27,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     values(1) match {
       case v: IndexedSeq[_] =>
         signal.t1b match {
-          case e: Aggregate => poke_nested(e, v)
           case e: TupleBundle => poke_nested(e, v)
+          case e: Aggregate => poke_nested(e, v)
           case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
         }
       case v: Int => poke_nested(signal.t1b, BigInt(v))
@@ -42,8 +42,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       value match {
         case v: IndexedSeq[_] =>
           elem match {
-            case e: Aggregate => poke_nested(e, v)
             case e: TupleBundle => poke_nested(e, v)
+            case e: Aggregate => poke_nested(e, v)
             case e => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
           }
         case v: Int => poke_nested(elem, v)
@@ -54,10 +54,10 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def poke_nested(signal: Data, value: Int): Unit = {
-    (signal.asUInt(), BigInt(value))
+    poke(signal.asUInt(), BigInt(value))
   }
   def poke_nested(signal: Data, value: BigInt): Unit = {
-    (signal.asUInt(), value)
+    poke(signal.asUInt(), value)
   }
 
  /*
