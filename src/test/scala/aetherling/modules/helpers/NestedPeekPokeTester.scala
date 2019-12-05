@@ -46,13 +46,23 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     }
   }
 
+  def poke_nested(signal: Data, values: IndexedSeq[_]): Unit = {
+    signal match {
+      case s: Aggregate => poke_nested(s, values)
+      case s => throw new Exception(s"Can't expect a nested set of values for a type $s")
+    }
+  }
+
+  def poke_nested(signal: Data, value: Boolean): Unit = {
+    poke(signal.asUInt(), boolean2BigInt(value))
+  }
+
   def poke_nested(signal: Data, value: Int): Unit = {
     poke(signal.asUInt(), BigInt(value))
   }
   def poke_nested(signal: Data, value: BigInt): Unit = {
     poke(signal.asUInt(), value)
   }
-
 
   def expect_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
@@ -95,6 +105,16 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     }
   }
 
+  def expect_nested(signal: Data, values: IndexedSeq[_]): Unit = {
+    signal match {
+      case s: Aggregate => expect_nested(s, values)
+      case s => throw new Exception(s"Can't expect a nested set of values for a type $s")
+    }
+  }
+
+  def expect_nested(signal: Data, value: Boolean): Unit = {
+    expect(signal.asUInt(), boolean2BigInt(value))
+  }
   def expect_nested(signal: Data, value: Int): Unit = {
     expect(signal.asUInt(), BigInt(value))
   }
@@ -107,8 +127,12 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case s: TupleBundle => s"Tuple(${peek_str(s.t0b)}, ${peek_str(s.t1b)})"
       case s: Aggregate => s"Vec(${s.getElements.map(peek_str).reduce((l,r) => l + ", " + r)})"
       case s: UInt => peek(s).toString
-      case s: Bool => peek(s).toString
       case s => s"Cannot peek_str $s which has class ${s.getClass}"
     }
+  }
+
+  def boolean2BigInt(in: Boolean) = in match {
+    case true => BigInt(1)
+    case false => BigInt(0)
   }
 }
