@@ -48,6 +48,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def poke_nested(signal: Data, values: IndexedSeq[_]): Unit = {
     signal match {
+      case s: TupleBundle => poke_nested(s, values)
       case s: Aggregate => poke_nested(s, values)
       case s => throw new Exception(s"Can't expect a nested set of values for a type $s")
     }
@@ -107,6 +108,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def expect_nested(signal: Data, values: IndexedSeq[_]): Unit = {
     signal match {
+      case s: TupleBundle => expect_nested(s, values)
       case s: Aggregate => expect_nested(s, values)
       case s => throw new Exception(s"Can't expect a nested set of values for a type $s")
     }
@@ -120,6 +122,23 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
   def expect_nested(signal: Data, value: BigInt): Unit = {
     expect(signal.asUInt(), value)
+  }
+
+  def peek_binary_module(t: MultiIOModule with BinaryInterface with ValidInterface, name: String): Unit = {
+    println(s"Printing $name")
+    println(s"in0: ${peek_str(t.in0)}")
+    println(s"in1: ${peek_str(t.in1)}")
+    println(s"out: ${peek_str(t.out)}")
+    println(s"valid_up: ${peek_str(t.valid_up)}")
+    println(s"valid_down: ${peek_str(t.valid_down)}")
+  }
+
+  def peek_unary_module(t: MultiIOModule with UnaryInterface with ValidInterface, name: String): Unit = {
+    println(s"Printing $name")
+    println(s"in: ${peek_str(t.in)}")
+    println(s"out: ${peek_str(t.out)}")
+    println(s"valid_up: ${peek_str(t.valid_up)}")
+    println(s"valid_down: ${peek_str(t.valid_down)}")
   }
 
   def peek_str(signal: Data): String = {
