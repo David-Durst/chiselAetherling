@@ -10,15 +10,15 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
   override val out = IO(Output(t.chiselRepr()))
 
   if (delay == 1) {
-    val dataReg = Reg(in)
+    val dataReg = RegNext(in)
     out := dataReg
-    val validReg = Reg(valid_up)
+    val validReg = RegNext(valid_up)
     valid_down := validReg
   }
   else {
-    val internalDelayCounter = Module(Counter(delay + 1))
-    val readCounter = Module(Counter(delay))
-    val writeCounter = Module(Counter(delay))
+    val internalDelayCounter = Counter(delay + 1)
+    val readCounter = Counter(delay)
+    val writeCounter = Counter(delay)
     val fifoBuffer = SyncReadMem(delay, t.chiselRepr())
 
     when(valid_up) {
@@ -31,7 +31,7 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
         valid_down := true.B
       }.otherwise( valid_down := false.B )
       fifoBuffer.write(writeCounter.value, in)
-      out := fifoBuffer.read(readCounter.value, valid_up)
-    }
+    }.otherwise( valid_down := false.B )
+    out := fifoBuffer.read(readCounter.value, valid_up)
   }
 }
