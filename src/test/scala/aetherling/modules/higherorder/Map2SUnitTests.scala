@@ -6,13 +6,7 @@ import chisel3._
 import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester, Pokeable}
 
 abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends PeekPokeTester(c) {
-  /*
-  def poke_nested(signal: Aggregate, values: IndexedSeq[Int]): Unit = {
-    poke(signal, values map { x => BigInt(x)})
-  }
-   */
-
-  def poke_nested[TS](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
+  def poke_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
       case v: Array[_] =>
         signal.t0b match {
@@ -37,7 +31,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     }
   }
 
-  def poke_nested[TS](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
+  def poke_nested(signal: Aggregate, values: IndexedSeq[_]): Unit = {
     (signal.getElements zip values).foreach{ case (elem, value) =>
       value match {
         case v: Array[_] =>
@@ -60,17 +54,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     poke(signal.asUInt(), value)
   }
 
- /*
-  def poke_nested_dispath(signal: Data, value: IndexedSeq[Data]): Unit = {
-    signal match {
-      case s: Aggregate => poke_nested(s, value)
-      case s: TupleBundle => poke_nested(s, value)
-      case _ => throw new Exception(s"Not a Vec or TupleBundle type trying to poke: $e")
-    }
-  }
-  */
 
-  def expect_nested[TS](signal: TupleBundle, values: IndexedSeq[TS]): Unit = {
+  def expect_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
       case v: Array[_] =>
         signal.t0b match {
@@ -95,7 +80,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     }
   }
 
-  def expect_nested[TS](signal: Aggregate, values: IndexedSeq[TS]): Unit = {
+  def expect_nested(signal: Aggregate, values: IndexedSeq[_]): Unit = {
     (signal.getElements zip values).foreach{ case (elem, value) =>
       value match {
         case v: Array[_] =>
@@ -116,14 +101,6 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
   def expect_nested(signal: Data, value: BigInt): Unit = {
     expect(signal.asUInt(), value)
-  }
-
-  private def extractElementBits(signal: Data): IndexedSeq[Element] = {
-    signal match {
-      case elt: Aggregate => elt.getElements.toIndexedSeq flatMap {extractElementBits(_)}
-      case elt: Element => IndexedSeq(elt)
-      case elt => throw new Exception(s"Cannot extractElementBits for type ${elt.getClass.getName}")
-    }
   }
 }
 
