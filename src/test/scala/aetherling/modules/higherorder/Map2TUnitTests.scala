@@ -13,7 +13,7 @@ class Map2TTupleUnitTester(c: Map2T) extends NestedPeekPokeTester(c) {
     poke_nested(c.valid_up, true)
     peek_binary_module(c, "map2 of atom_tuple")
     expect_nested(c.out, Array(i, i+17))
-    //expect_nested(c.valid_down, true)
+    expect_nested(c.valid_down, true)
     step(1)
   }
 }
