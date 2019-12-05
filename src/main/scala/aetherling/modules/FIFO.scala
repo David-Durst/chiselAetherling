@@ -21,17 +21,25 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
     val writeCounter = Counter(delay)
     val fifoBuffer = SyncReadMem(delay, t.chiselRepr())
 
+    printf("idc cur value: %d", internalDelayCounter.value)
     when(valid_up) {
       writeCounter.inc()
       when(internalDelayCounter.value < delay.U) {
+        printf("idc inc")
         internalDelayCounter.inc()
       }
       when(internalDelayCounter.value === delay.U) {
         readCounter.inc()
         valid_down := true.B
-      }.otherwise( valid_down := false.B )
+        out := fifoBuffer.read(readCounter.value, internalDelayCounter.value === delay.U)
+      }.otherwise {
+        out := DontCare
+        valid_down := false.B
+      }
       fifoBuffer.write(writeCounter.value, in)
-    }.otherwise( valid_down := false.B )
-    out := fifoBuffer.read(readCounter.value, valid_up)
+    }.otherwise {
+      valid_down := false.B
+      out := DontCare
+    }
   }
 }
