@@ -16,30 +16,32 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
     valid_down := validReg
   }
   else {
-    val internalDelayCounter = Counter(delay)
+    val internalDelayCounter = Counter(delay + 1)
     val readCounter = Counter(delay + 1)
     val writeCounter = Counter(delay + 1)
     val fifoBuffer = SyncReadMem(delay + 1, t.chiselRepr())
 
+    /*
     printf("idc cur value: %d\n", internalDelayCounter.value)
     printf("delay: %d\n", delay.U)
     printf("write cur value: %d\n", writeCounter.value)
     printf("read cur value: %d\n", readCounter.value)
     printf("valid cur clock: %d\n", internalDelayCounter.value < (delay - 1).U)
     printf("op valid cur clock: %d\n", internalDelayCounter.value >= (delay - 1).U)
-    valid_down := internalDelayCounter.value < delay.U
+     */
+    valid_down := internalDelayCounter.value === delay.U
     when(valid_up) {
       writeCounter.inc()
       fifoBuffer.write(writeCounter.value, in)
 
-      when(internalDelayCounter.value < (delay - 1).U) {
+      when(internalDelayCounter.value < delay.U) {
         printf("idc inc\n")
         internalDelayCounter.inc()
-        out := DontCare
-      }.otherwise {
-        out := fifoBuffer.read(readCounter.value, internalDelayCounter.value === (delay - 1).U)
-        readCounter.inc()
       }
+      when(internalDelayCounter.value >= (delay - 1).U) {
+        out := fifoBuffer.read(readCounter.value, internalDelayCounter.value >= (delay - 1).U)
+        readCounter.inc()
+      }.otherwise { out := DontCare }
     }.otherwise {
       out := DontCare
     }
