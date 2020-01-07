@@ -15,3 +15,14 @@ class MapT(t: => MultiIOModule with UnaryInterface with ValidInterface)
     out := op.out
     valid_down := op.valid_down
 }
+
+class MapTNoValid(t: => MultiIOModule with UnaryInterface)
+  extends MultiIOModule with UnaryInterface {
+    val op = Module(t)
+
+    override val in = IO(Input(chiselTypeOf(op.in)))
+    override val out = IO(Output(chiselTypeOf(op.out)))
+
+    op.in := in
+    out := op.out
+}

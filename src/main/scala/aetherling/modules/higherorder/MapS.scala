@@ -18,3 +18,17 @@ class MapS(n: Int, t: => MultiIOModule with UnaryInterface with ValidInterface)
   }
   valid_down := ops map { op => op.valid_down } reduce { (vdown0, vdown1) => vdown0 & vdown1 }
 }
+
+class MapSNoValid(n: Int, t: => MultiIOModule with UnaryInterface)
+  extends MultiIOModule with UnaryInterface {
+  val ops = (0 to (n-1)).map(_ => Module(t))
+  val fst_op = ops.head
+
+  override val in = IO(Input(Vec(n, chiselTypeOf(fst_op.in))))
+  override val out = IO(Output(Vec(n, chiselTypeOf(fst_op.out))))
+
+  ops.zipWithIndex.foreach { case (op, i) =>
+    op.in := in(i)
+    out(i) := op.out
+  }
+}
