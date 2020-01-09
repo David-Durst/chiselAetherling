@@ -1,5 +1,7 @@
 ### Project Specific stuff
 test_run_dir/*
+src/main/scala/aetherling/modules/Top.*
+Top.*
 ### XilinxISE template
 # intermediate build files
 *.bgn
