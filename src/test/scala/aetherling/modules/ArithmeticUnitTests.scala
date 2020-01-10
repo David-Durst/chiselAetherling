@@ -20,6 +20,7 @@ class AbsUnitTester(c: Abs) extends PeekPokeTester(c) {
     poke(c.in, BigInt(i))
     //println(s"in: ${peek(c.io.in)}")
     //println(s"out: ${peek(c.io.out)}")
+    step(1)
     expect(c.out, scala.math.abs(i))
   }
 }
