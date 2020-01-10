@@ -24,7 +24,7 @@ class FIFO4UnitTester(c: FIFO) extends NestedPeekPokeTester(c) {
   for(i <- 1 to 41 by 2) {
     poke_nested(c.in, i)
     poke_nested(c.valid_up, true)
-    peek_unary_module(c, "fifo4")
+    peek_unary_module(c)
     if (i > 7) {
       expect_nested(c.out, i - 2*4)
       expect_nested(c.valid_down, true)

@@ -1,8 +1,9 @@
 package aetherling.modules
 
-import aetherling.modules.helpers.{BinaryInterface, NestedPeekPokeTester, UnaryInterface, ValidInterface}
-import aetherling.modules.higherorder.{Map2S, Map2SAddUnitTester, Map2STupleUnitTester, MapS, TestAdder}
-import aetherling.types.{SSeq, STInt}
+import aetherling.modules.helpers._
+import aetherling.modules.higherorder._
+import aetherling.modules._
+import aetherling.types._
 import chisel3._
 import chisel3.iotesters.ChiselFlatSpec
 
@@ -10,8 +11,8 @@ class PipelinedAdderTest(c: PipelinedAdder) extends NestedPeekPokeTester(c) {
   poke_nested(c.valid_up, true.B)
   for(i <- 0 to 10 by 1) {
     poke_nested(c.in, (0 to 200).map(j => BigInt(i+j)))
-    //println(s"Cycle $i")
-    //peek_unary_module(c, "PipelinedAdder")
+    println(s"Cycle $i")
+    peek_unary_module(c)
     if (i >= 4) {
       expect_nested(c.out, (0 to 200).map(j => (i - 4) + j + 5))
     }
