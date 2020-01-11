@@ -6,16 +6,14 @@ import chisel3.MultiIOModule
 import chisel3._
 import chisel3.util.Counter
 
-class Const[T](t: STTypeDefinition, data: Seq[Data], delay: Int)
-  extends MultiIOModule with NullaryInterface with ValidInterface {
-  override val O = IO(Output(t.chiselRepr()))
+object Const{
+  def apply[T <: Data](t: STTypeDefinition, rom: Vec[T], delay: Int, valid_up: Bool): (T, Bool) = {
+    val enabled = if (delay == 0) true.B else {
+      val delay_counter = Module(new InitialDelayCounter(delay))
+      delay_counter.valid_up := valid_up
+      delay_counter.valid_down
+    }
 
-  val enabled = if (delay == 0) true.B else {
-    val delay_counter = Module(new InitialDelayCounter(delay))
-    delay_counter.valid_up := valid_up
-    delay_counter.valid_down
+    (rom(Counter(rom.length).value), enabled)
   }
-
-  val rom = VecInit(data)
-  val r = rom(Counter(rom.length).value)
 }
