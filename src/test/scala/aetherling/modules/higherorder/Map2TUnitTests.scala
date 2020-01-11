@@ -8,11 +8,11 @@ import chisel3.iotesters.ChiselFlatSpec
 
 class Map2TTupleUnitTester(c: Map2T) extends NestedPeekPokeTester(c) {
   for(i <- 0 to 10 by 1) {
-    poke_nested(c.in0, i)
-    poke_nested(c.in1, i+17)
+    poke_nested(c.I0, i)
+    poke_nested(c.I1, i+17)
     poke_nested(c.valid_up, true)
     peek_binary_module(c)
-    expect_nested(c.out, Array(i, i+17))
+    expect_nested(c.O, Array(i, i+17))
     expect_nested(c.valid_down, true)
     step(1)
   }

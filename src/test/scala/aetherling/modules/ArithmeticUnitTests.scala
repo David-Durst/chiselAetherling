@@ -9,19 +9,19 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 class AddUnitTester(c: Add) extends PeekPokeTester(c) {
   for(i <- 1 to 40 by 3) {
     for (j <- 1 to 40 by 7) {
-      poke(c.in, Array(BigInt(i), BigInt(j)))
-      expect(c.out, i + j)
+      poke(c.I, Array(BigInt(i), BigInt(j)))
+      expect(c.O, i + j)
     }
   }
 }
 
 class AbsUnitTester(c: Abs) extends PeekPokeTester(c) {
   for(i <- -10 to 10 by 1) {
-    poke(c.in, BigInt(i))
+    poke(c.I, BigInt(i))
     //println(s"in: ${peek(c.io.in)}")
     //println(s"out: ${peek(c.io.out)}")
     step(1)
-    expect(c.out, scala.math.abs(i))
+    expect(c.O, scala.math.abs(i))
   }
 }
 

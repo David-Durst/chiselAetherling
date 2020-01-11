@@ -6,12 +6,12 @@ import chisel3._
 import chisel3.util.Counter
 
 class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val in = IO(Input(t.chiselRepr()))
-  override val out = IO(Output(t.chiselRepr()))
+  override val I = IO(Input(t.chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
 
   if (delay == 1) {
-    val dataReg = RegNext(in)
-    out := dataReg
+    val dataReg = RegNext(I)
+    O := dataReg
     val validReg = RegNext(valid_up)
     valid_down := validReg
   }
@@ -32,18 +32,18 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
     valid_down := internalDelayCounter.value === delay.U
     when(valid_up) {
       writeCounter.inc()
-      fifoBuffer.write(writeCounter.value, in)
+      fifoBuffer.write(writeCounter.value, I)
 
       when(internalDelayCounter.value < delay.U) {
         printf("idc inc\n")
         internalDelayCounter.inc()
       }
       when(internalDelayCounter.value >= (delay - 1).U) {
-        out := fifoBuffer.read(readCounter.value, internalDelayCounter.value >= (delay - 1).U)
+        O := fifoBuffer.read(readCounter.value, internalDelayCounter.value >= (delay - 1).U)
         readCounter.inc()
-      }.otherwise { out := DontCare }
+      }.otherwise { O := DontCare }
     }.otherwise {
-      out := DontCare
+      O := DontCare
     }
   }
 }

@@ -7,10 +7,11 @@ import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester}
 
 class MapTAbsUnitTester(c: MapT) extends PeekPokeTester(c) {
   for(i <- -10 to 10 by 1) {
-    poke(c.in.asInstanceOf[UInt], BigInt(i))
+    poke(c.I.asInstanceOf[UInt], BigInt(i))
     //println(s"in: ${peek(c.io.in)}")
     //println(s"out: ${peek(c.io.out)}")
-    expect(c.out.asInstanceOf[UInt], scala.math.abs(i))
+    step(1)
+    expect(c.O.asInstanceOf[UInt], scala.math.abs(i))
   }
 }
 

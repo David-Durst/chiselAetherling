@@ -8,27 +8,27 @@ import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester, Pokeable}
 
 class Map2STupleUnitTester(c: Map2S) extends NestedPeekPokeTester(c) {
   for(i <- 0 to 10 by 1) {
-    poke_nested(c.in0, (0 to 3).map(j => BigInt(i*j)))
-    poke_nested(c.in1, (0 to 3).map(j => BigInt(i*j+17)))
-    println(s"in0: ${peek_str(c.in0)}")
-    println(s"in1: ${peek_str(c.in1)}")
-    println(s"out: ${peek_str(c.out)}")
-    expect_nested(c.out, (0 to 3).map(j => Array(i*j, i*j+17)))
+    poke_nested(c.I0, (0 to 3).map(j => BigInt(i*j)))
+    poke_nested(c.I1, (0 to 3).map(j => BigInt(i*j+17)))
+    println(s"in0: ${peek_str(c.I0)}")
+    println(s"in1: ${peek_str(c.I1)}")
+    println(s"out: ${peek_str(c.O)}")
+    expect_nested(c.O, (0 to 3).map(j => Array(i*j, i*j+17)))
   }
 }
 
 class TestAdder extends MultiIOModule with BinaryInterface with ValidInterface {
-  override val in0: Data = IO(Input(STInt(8).chiselRepr()))
-  override val in1: Data = IO(Input(STInt(8).chiselRepr()))
-  override val out: Data = IO(Output(STInt(8).chiselRepr()))
+  override val I0: Data = IO(Input(STInt(8).chiselRepr()))
+  override val I1: Data = IO(Input(STInt(8).chiselRepr()))
+  override val O: Data = IO(Output(STInt(8).chiselRepr()))
 
   val tupler = Module(new AtomTuple(STInt(8), STInt(8)))
   val inner_adder = Module(new Add(STInt(8)))
 
-  tupler.in0 := in0
-  tupler.in1 := in1
-  inner_adder.in := tupler.out
-  out := inner_adder.out
+  tupler.I0 := I0
+  tupler.I1 := I1
+  inner_adder.I := tupler.O
+  O := inner_adder.O
   tupler.valid_up := valid_up
   inner_adder.valid_up := tupler.valid_down
   valid_down := inner_adder.valid_down
@@ -36,17 +36,17 @@ class TestAdder extends MultiIOModule with BinaryInterface with ValidInterface {
 
 class Map2SAddUnitTester(c: Map2S) extends NestedPeekPokeTester(c) {
   for(i <- 0 to 10 by 1) {
-    poke_nested(c.in0, (0 to 3).map(j => BigInt(i*j)))
-    poke_nested(c.in1, (0 to 3).map(j => BigInt(i*j+17)))
-    expect_nested(c.out, (0 to 3).map(j => i*j + i*j+17))
+    poke_nested(c.I0, (0 to 3).map(j => BigInt(i*j)))
+    poke_nested(c.I1, (0 to 3).map(j => BigInt(i*j+17)))
+    expect_nested(c.O, (0 to 3).map(j => i*j + i*j+17))
   }
 }
 
 class Map2SAddBigUnitTester(c: Map2S) extends NestedPeekPokeTester(c) {
   for(i <- 0 to 10 by 1) {
-    poke_nested(c.in0, (0 to 200).map(j => BigInt(i+j)))
-    poke_nested(c.in1, (0 to 200).map(j => BigInt(i)))
-    expect_nested(c.out, (0 to 200).map(j => i+j + i))
+    poke_nested(c.I0, (0 to 200).map(j => BigInt(i+j)))
+    poke_nested(c.I1, (0 to 200).map(j => BigInt(i)))
+    expect_nested(c.O, (0 to 200).map(j => i+j + i))
   }
 }
 

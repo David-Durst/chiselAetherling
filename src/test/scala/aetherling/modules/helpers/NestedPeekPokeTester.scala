@@ -125,9 +125,9 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def peek_binary_module(t: MultiIOModule with BinaryInterface with ValidInterface): Unit = {
-    println(s"in0: ${peek_str(t.in0)}")
-    println(s"in1: ${peek_str(t.in1)}")
-    println(s"out: ${peek_str(t.out)}")
+    println(s"in0: ${peek_str(t.I0)}")
+    println(s"in1: ${peek_str(t.I1)}")
+    println(s"out: ${peek_str(t.O)}")
     println(s"valid_up: ${peek_str(t.valid_up)}")
     println(s"valid_down: ${peek_str(t.valid_down)}")
   }
@@ -141,8 +141,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def peek_unary_module(t: MultiIOModule with UnaryInterface with ValidInterface): Unit = {
-    println(s"in: ${peek_str(t.in)}")
-    println(s"out: ${peek_str(t.out)}")
+    println(s"in: ${peek_str(t.I)}")
+    println(s"out: ${peek_str(t.O)}")
     println(s"valid_up: ${peek_str(t.valid_up)}")
     println(s"valid_down: ${peek_str(t.valid_down)}")
   }
@@ -155,7 +155,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def peek_nullary_module(t: MultiIOModule with NullaryInterface with ValidInterface): Unit = {
-    println(s"out: ${peek_str(t.out)}")
+    println(s"out: ${peek_str(t.O)}")
     println(s"valid_up: ${peek_str(t.valid_up)}")
     println(s"valid_down: ${peek_str(t.valid_down)}")
   }

@@ -9,9 +9,9 @@ import chisel3._
   * @param t the Space-Time Int type (specifies width)
   */
 class Add(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val in = IO(Input(STAtomTuple(t,t).chiselRepr()))
-  override val out = IO(Output(t.chiselRepr()))
-  out := in.t0b.asUInt() + in.t1b.asUInt()
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := I.t0b.asUInt() + I.t1b.asUInt()
   valid_down := valid_up
 }
 
@@ -20,9 +20,9 @@ class Add(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
   * @param t the Space-Time Int type (specifies width)
   */
 class AddNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
-  override val in = IO(Input(STAtomTuple(t,t).chiselRepr()))
-  override val out = IO(Output(t.chiselRepr()))
-  out := in.t0b.asUInt() + in.t1b.asUInt()
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := I.t0b.asUInt() + I.t1b.asUInt()
 }
 
 /**
@@ -30,11 +30,11 @@ class AddNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
   * @param t the Space-Time Int type (specifies width)
   */
 class Abs(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val in = IO(Input(t.chiselRepr()))
-  override val out = IO(Output(t.chiselRepr()))
+  override val I = IO(Input(t.chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
   val out_reg = Reg(t.chiselRepr())
-  when(in.asSInt() < 0.S) { out_reg := 0.U - in }.otherwise( out_reg := in )
-  out := out_reg
+  when(I.asSInt() < 0.S) { out_reg := 0.U - I }.otherwise( out_reg := I )
+  O := out_reg
   valid_down := RegNext(valid_up)
 }
 
@@ -43,20 +43,20 @@ class Abs(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
   * @param t the Space-Time Int type (specifies width)
   */
 class AbsNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
-  override val in = IO(Input(t.chiselRepr()))
-  override val out = IO(Output(t.chiselRepr()))
+  override val I = IO(Input(t.chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
   val out_reg = Reg(t.chiselRepr())
-  when(in.asSInt() < 0.S) { out_reg := 0.U - in }.otherwise( out_reg := in )
-  out := out_reg
+  when(I.asSInt() < 0.S) { out_reg := 0.U - I }.otherwise( out_reg := I )
+  O := out_reg
 }
 
 /**
   * Not of an Bit atom
   */
 class Not() extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val in = IO(Input(STBit().chiselRepr()))
-  override val out = IO(Output(STBit().chiselRepr()))
-  out := ~in
+  override val I = IO(Input(STBit().chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := ~I
   valid_down := valid_up
 }
 
@@ -64,7 +64,7 @@ class Not() extends MultiIOModule with UnaryInterface with ValidInterface {
   * Not of an Bit atom with no valid interface
   */
 class NotNoValid() extends MultiIOModule with UnaryInterface {
-  override val in = IO(Input(STBit().chiselRepr()))
-  override val out = IO(Output(STBit().chiselRepr()))
-  out := ~in
+  override val I = IO(Input(STBit().chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := ~I
 }

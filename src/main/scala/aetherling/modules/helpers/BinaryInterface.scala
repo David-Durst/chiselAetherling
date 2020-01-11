@@ -3,7 +3,7 @@ package aetherling.modules.helpers
 import chisel3._
 
 trait BinaryInterface {
-  val in0: Data
-  val in1: Data
-  val out: Data
+  val I0: Data
+  val I1: Data
+  val O: Data
 }

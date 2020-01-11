@@ -7,10 +7,10 @@ import chisel3.iotesters.{ChiselFlatSpec, PeekPokeTester}
 
 class FIFO1UnitTester(c: FIFO) extends NestedPeekPokeTester(c) {
   for(i <- 1 to 40 by 3) {
-    poke_nested(c.in, i)
+    poke_nested(c.I, i)
     poke_nested(c.valid_up, true)
     if (i > 1) {
-      expect_nested(c.out, i - 3)
+      expect_nested(c.O, i - 3)
       expect_nested(c.valid_down, true)
     }
     else {
@@ -22,11 +22,11 @@ class FIFO1UnitTester(c: FIFO) extends NestedPeekPokeTester(c) {
 
 class FIFO4UnitTester(c: FIFO) extends NestedPeekPokeTester(c) {
   for(i <- 1 to 41 by 2) {
-    poke_nested(c.in, i)
+    poke_nested(c.I, i)
     poke_nested(c.valid_up, true)
     peek_unary_module(c)
     if (i > 7) {
-      expect_nested(c.out, i - 2*4)
+      expect_nested(c.O, i - 2*4)
       expect_nested(c.valid_down, true)
     }
     else {

@@ -1,6 +1,5 @@
 package aetherling.modules.helpers
 
-import aetherling.modules.helpers.{UnaryInterface, ValidInterface}
 import chisel3.util.log2Ceil
 import chisel3._
 

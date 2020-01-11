@@ -8,7 +8,7 @@ import chisel3.util.Counter
 
 class Const[T](t: STTypeDefinition, data: Seq[Data], delay: Int)
   extends MultiIOModule with NullaryInterface with ValidInterface {
-  override val out = IO(Output(t.chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
 
   val enabled = if (delay == 0) true.B else {
     val delay_counter = Module(new InitialDelayCounter(delay))

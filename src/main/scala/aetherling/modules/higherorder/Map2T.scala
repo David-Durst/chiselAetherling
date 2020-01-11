@@ -7,13 +7,13 @@ class Map2T(t: => MultiIOModule with BinaryInterface with ValidInterface)
   extends MultiIOModule with BinaryInterface with ValidInterface {
     val op = Module(t)
 
-    override val in0 = IO(Input(chiselTypeOf(op.in0)))
-    override val in1 = IO(Input(chiselTypeOf(op.in1)))
-    override val out = IO(Output(chiselTypeOf(op.out)))
+    override val I0 = IO(Input(chiselTypeOf(op.I0)))
+    override val I1 = IO(Input(chiselTypeOf(op.I1)))
+    override val O = IO(Output(chiselTypeOf(op.O)))
 
     op.valid_up := valid_up
-    op.in0 := in0
-    op.in1 := in1
-    out := op.out
+    op.I0 := I0
+    op.I1 := I1
+    O := op.O
     valid_down := op.valid_down
 }
