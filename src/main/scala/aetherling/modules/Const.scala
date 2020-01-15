@@ -1,9 +1,8 @@
 package aetherling.modules
 
-import aetherling.modules.helpers.{NullaryInterface, ValidInterface, InitialDelayCounter}
+import aetherling.modules.helpers.{InitialDelayCounter, NullaryInterface, ValidInterface}
 import aetherling.types._
-import chisel3.MultiIOModule
-import chisel3._
+import chisel3.{Data, MultiIOModule, _}
 import chisel3.util.Counter
 
 object Const{
@@ -18,4 +17,6 @@ object Const{
     printf("counter_val: %d\n", counter_val)
     (rom(counter_val), enabled)
   }
+
+  def make_vec[T <: Data](elts: T*): Vec[T] = VecInit(elts)
 }
