@@ -14,6 +14,8 @@ object Const{
       delay_counter.valid_down
     }
 
-    (rom(Counter(rom.length).value), enabled)
+    val (counter_val, _) = Counter(enabled, rom.length)
+    printf("counter_val: %d\n", counter_val)
+    (rom(counter_val), enabled)
   }
 }
