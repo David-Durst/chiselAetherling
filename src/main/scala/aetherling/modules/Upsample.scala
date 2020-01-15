@@ -16,12 +16,9 @@ class UpS(n: Int, elem_t: STTypeDefinition) extends MultiIOModule  with UnaryInt
 }
 
 class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with UnaryInterface with ValidInterface {
-  val I = IO(Input(SSeq(1, elem_t).chiselRepr()))
-  val O = IO(Output(SSeq(n, elem_t).chiselRepr()))
-
-  for (i <- 0 to (n-1)) {
-    O(i) := I
-  }
+  val I = IO(Input(TSeq(1, n + i - 1, elem_t).chiselRepr()))
+  val O = IO(Output(TSeq(n, i, elem_t).chiselRepr()))
+  O := I
 
   val (element_time_counter_value, _) = Counter(valid_up, elem_t.time())
   val (element_idx_counter_value, _) = Counter(valid_up && (element_time_counter_value === elem_t.time().U), n + i)
