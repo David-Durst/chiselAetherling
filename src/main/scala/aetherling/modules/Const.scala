@@ -9,12 +9,14 @@ object Const{
   def apply[T <: Data](t: STTypeDefinition, rom: Vec[T], delay: Int, valid_up: Bool): (T, Bool) = {
     val enabled = if (delay == 0) true.B else {
       val delay_counter = Module(new InitialDelayCounter(delay))
-      delay_counter.valid_up := valid_up
+      // delay handles when to start this counter. don't listen to valid signal.
+      // just handle valid signal to make interfaces uniform for Haskell compiler.
+      delay_counter.valid_up := true.B
       delay_counter.valid_down
     }
 
+
     val (counter_val, _) = Counter(enabled, rom.length)
-    printf("counter_val: %d\n", counter_val)
     (rom(counter_val), enabled)
   }
 
