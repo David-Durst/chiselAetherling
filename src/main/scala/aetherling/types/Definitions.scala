@@ -31,6 +31,8 @@ abstract class STTypeDefinition {
   def chiselRepr(): Data
 }
 
+trait STIntOrBit extends STTypeDefinition
+
 case class TSeq[T <: STTypeDefinition](n: Int, i: Int, t: T) extends STTypeDefinition {
   /**
     * Total amount of atoms over the entire time of the ST type
@@ -152,7 +154,7 @@ case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t
   override def chiselRepr(): TupleBundle = new TupleBundle(t0, t1)
 }
 
-case class STInt(width: Int) extends STTypeDefinition {
+case class STInt(width: Int) extends STTypeDefinition with STIntOrBit {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
@@ -182,7 +184,7 @@ case class STInt(width: Int) extends STTypeDefinition {
   override def chiselRepr(): UInt = UInt(width.W)
 }
 
-case class STBit() extends STTypeDefinition {
+case class STBit() extends STTypeDefinition with STIntOrBit {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
