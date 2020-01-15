@@ -90,7 +90,7 @@ case class SSeq[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition {
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): Data = Vec(n, t.chiselRepr())
+  override def chiselRepr(): Vec[Data] = Vec(n, t.chiselRepr())
 }
 
 case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition {
