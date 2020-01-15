@@ -10,7 +10,7 @@ class UpS(n: Int, elem_t: STTypeDefinition) extends MultiIOModule  with UnaryInt
   val O = IO(Output(SSeq(n, elem_t).chiselRepr()))
 
   for (i <- 0 to (n-1)) {
-    O(i) := I
+    O(i) := I(0)
   }
   valid_down := valid_up
 }
@@ -21,15 +21,16 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
   O := I
 
   val (element_time_counter_value, _) = Counter(valid_up, elem_t.time())
-  val (element_idx_counter_value, _) = Counter(valid_up && (element_time_counter_value === elem_t.time().U), n + i)
+  val (element_idx_counter_value, _) =
+    Counter(valid_up && (element_time_counter_value === (elem_t.time() - 1).U), n + i)
 
   // Create a synchronous-read, synchronous-write memory (like in FPGAs SRAMs).
   // using memory rather than registers as can be larger and want synthesizer to pick mem or reg
   val mem = SyncReadMem(1, elem_t.chiselRepr())
-  // Create one write port and one read port.
-  mem.write(0.U, I)
+  // Create one port memory for read and write
   val dataOut = Wire(elem_t.chiselRepr())
-  dataOut := mem.read(0.U, valid_up)
+  when(element_idx_counter_value === 0.U) { mem.write(0.U, I); dataOut := DontCare }
+    .otherwise( dataOut := mem.read(0.U, valid_up) )
 
   when(element_idx_counter_value === 0.U) { O := I } otherwise { O := dataOut }
 

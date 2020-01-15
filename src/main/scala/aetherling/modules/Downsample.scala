@@ -9,7 +9,7 @@ class DownS(n: Int, idx: Int, elem_t: STTypeDefinition) extends MultiIOModule  w
   val I = IO(Input(SSeq(n, elem_t).chiselRepr()))
   val O = IO(Output(SSeq(1, elem_t).chiselRepr()))
 
-  O := I(idx)
+  O(0) := I(idx)
   valid_down := valid_up
 }
 
