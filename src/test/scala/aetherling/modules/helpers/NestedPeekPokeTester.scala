@@ -1,6 +1,7 @@
 package aetherling.modules.helpers
 
 import aetherling.types.TupleBundle
+import chisel3.experimental.DataMirror
 import chisel3.iotesters.PeekPokeTester
 import chisel3.{Aggregate, Bool, Data, MultiIOModule, UInt}
 
@@ -143,6 +144,12 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     println(s"out: ${peek_str(t.O)}")
     println(s"valid_up: ${peek_str(t.valid_up)}")
     println(s"valid_down: ${peek_str(t.valid_down)}")
+  }
+
+  def peek_any_module(t: MultiIOModule): Unit = {
+    DataMirror.modulePorts(c).foreach { case (name, port) => {
+      println(s"$name: ${peek_str(port)}")
+    }}
   }
 
   def peek_str(signal: Data): String = {

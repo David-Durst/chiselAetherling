@@ -1,6 +1,5 @@
 package aetherling.modules.helpers
 
-import aetherling.modules.{Abs, Add, AddUnitTester}
 import aetherling.types._
 import chisel3._
 import chisel3.iotesters

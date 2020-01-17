@@ -11,7 +11,7 @@ import math.max
 class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
   val RE = IO(Input(Bool()))
   val RADDR = IO(Input(UInt(getRAMAddrWidth(n))))
-  val RDATA = IO(Input(t.chiselRepr()))
+  val RDATA = IO(Output(t.chiselRepr()))
   val WE = IO(Input(Bool()))
   val WADDR = IO(Input(UInt(getRAMAddrWidth(n))))
   val WDATA = IO(Input(t.chiselRepr()))
@@ -28,11 +28,11 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
 
   val ramOutWires = (for (_ <- 0 to n-1) yield Wire(t.chiselRepr())).toArray
   for (i <- 0 to (n-1)) {
-    when(i.U === WADDR && write_elem_counter.valid) { rams(i).write(WADDR, WDATA) }
+    when(i.U === WADDR && write_elem_counter.valid) { rams(i).write(write_elem_counter.cur_valid, WDATA) }
     ramOutWires(i) := rams(i).read(read_elem_counter.cur_valid, read_elem_counter.valid)
   }
 
-  RDATA := MuxLookup(read_elem_counter.cur_valid, ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
+  RDATA := MuxLookup(RADDR, ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
 
   def getRAMAddrWidth(n: Int) = max((n-1).U.getWidth, 1).W
 }
