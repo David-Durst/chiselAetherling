@@ -8,7 +8,7 @@ import chisel3.{Aggregate, Bool, Data, MultiIOModule, UInt}
 abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends PeekPokeTester(c) {
   def poke_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
-      case v: Array[_] =>
+      case v: IndexedSeq[_] =>
         signal.t0b match {
           case e: TupleBundle => poke_nested(e, v)
           case e: Aggregate => poke_nested(e, v)
@@ -19,7 +19,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case _ => throw new Exception(s"Cannot poke value ${signal.t0b.getClass.getName}")
     }
     values(1) match {
-      case v: Array[_] =>
+      case v: IndexedSeq[_] =>
         signal.t1b match {
           case e: TupleBundle => poke_nested(e, v)
           case e: Aggregate => poke_nested(e, v)
@@ -34,7 +34,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   def poke_nested(signal: Aggregate, values: IndexedSeq[_]): Unit = {
     (signal.getElements zip values).foreach{ case (elem, value) =>
       value match {
-        case v: Array[_] =>
+        case v: IndexedSeq[_] =>
           elem match {
             case e: TupleBundle => poke_nested(e, v)
             case e: Aggregate => poke_nested(e, v)
@@ -68,7 +68,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def expect_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
-      case v: Array[_] =>
+      case v: IndexedSeq[_] =>
         signal.t0b match {
           case e: TupleBundle => expect_nested(e, v)
           case e: Aggregate => expect_nested(e, v)
@@ -79,7 +79,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case _ => throw new Exception(s"Cannot expect value ${signal.t0b.getClass.getName}")
     }
     values(1) match {
-      case v: Array[_] =>
+      case v: IndexedSeq[_] =>
         signal.t1b match {
           case e: TupleBundle => expect_nested(e, v)
           case e: Aggregate => expect_nested(e, v)
@@ -94,7 +94,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   def expect_nested(signal: Aggregate, values: IndexedSeq[_]): Unit = {
     (signal.getElements zip values).foreach{ case (elem, value) =>
       value match {
-        case v: Array[_] =>
+        case v: IndexedSeq[_] =>
           elem match {
             case e: TupleBundle => expect_nested(e, v)
             case e: Aggregate => expect_nested(e, v)
@@ -166,9 +166,41 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     case false => BigInt(0)
   }
 
-  def compute_num_atoms_per_sseq_layer(signal: Aggregate): IndexedSeq[Int] = {
-    signal.getElements map compute_num_atoms_per_sseq_layer scanRight(0, )
+  /**
+    * Given a flat indexed seq, return a nested one
+    * @param values
+    * @return
+    */
+  def nest_indexed_seq(values: IndexedSeq[_], nesting_per_layer: IndexedSeq[Int]): IndexedSeq[_] = {
+    if (nesting_per_layer.size <= 1) {
+      // if at bottom layer of nesting or no nesting, just return
+      values
+    }
+    else {
+      // if not at bottom layer, group and operate on elements of group
+      val grouped_values = values.grouped(nesting_per_layer(1))
+      grouped_values map {(group: IndexedSeq[_]) => nest_indexed_seq(group, nesting_per_layer.tail)} toIndexedSeq
+    }
   }
 
-  def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = Array(1)
+  def nest_indexed_seq(values: Int, nesting_per_layer: IndexedSeq[Int]) = values
+  def nest_indexed_seq(values: Boolean, nesting_per_layer: IndexedSeq[Int]) = values
+
+
+  /**
+    * The number of UInt, Bool, and Tuple elements per layer of Vec
+    * @param signal The nested chisel value to inspect
+    */
+  def compute_num_atoms_per_sseq_layer(signal: Aggregate): IndexedSeq[Int] = {
+    val signal_elements = signal.getElements
+    val lower_layer_elements =
+      signal_elements(0).isInstanceOf[Aggregate] match {
+        case true => compute_num_atoms_per_sseq_layer(signal_elements(0).asInstanceOf[Aggregate])
+        case false => compute_num_atoms_per_sseq_layer(signal_elements(0))
+      }
+    val top_layer_num_elements = if (lower_layer_elements.isEmpty) 1 else lower_layer_elements(0)
+    (signal_elements.size * top_layer_num_elements) +: lower_layer_elements
+  }
+
+  def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = Array[Int]()
 }
