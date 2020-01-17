@@ -147,7 +147,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def peek_any_module(t: MultiIOModule): Unit = {
-    DataMirror.modulePorts(c).foreach { case (name, port) => {
+    DataMirror.modulePorts(t).foreach { case (name, port) => {
       println(s"$name: ${peek_str(port)}")
     }}
   }

@@ -17,12 +17,9 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
   val WDATA = IO(Input(t.chiselRepr()))
 
 
-  val (read_counter_value, _) = Counter(RE, t.time())
-  val (write_counter_value, _) = Counter(WE, t.time())
   val write_elem_counter = Module(new NestedCountersWithNumValid(t, false))
   val read_elem_counter = Module(new NestedCountersWithNumValid(t, false))
-  printf("write_elem_counter_valid: %d\n", write_elem_counter.valid)
-  printf("read_elem_counter_valid: %d\n", read_elem_counter.valid)
+  printf("write_elem_counter_valid: %d\nread_elem_counter_valid: %d\nread_elem_cur_valid: %d\n", write_elem_counter.valid, read_elem_counter.valid, read_elem_counter.cur_valid)
   write_elem_counter.CE := WE
   read_elem_counter.CE := RE
 

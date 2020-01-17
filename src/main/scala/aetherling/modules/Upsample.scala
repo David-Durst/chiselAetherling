@@ -23,8 +23,8 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
   val (element_time_counter_value, _) = Counter(valid_up, elem_t.time())
   val (element_idx_counter_value, _) =
     Counter(valid_up && (element_time_counter_value === (elem_t.time() - 1).U), n + i)
-  printf("element_time_counter_value: %d\n", element_time_counter_value)
-  printf("element_idx_counter_value: %d\n", element_idx_counter_value)
+  //printf("element_time_counter_value: %d\n", element_time_counter_value)
+  //printf("element_idx_counter_value: %d\n", element_idx_counter_value)
 
   // Create a synchronous-read, synchronous-write memory (like in FPGAs SRAMs).
   // using memory rather than registers as can be larger and want synthesizer to pick mem or reg
@@ -35,8 +35,14 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
   mem.RADDR := 0.U
   mem.WDATA := I
   dataOut := mem.RDATA
-  when(element_idx_counter_value === 0.U) { mem.WE := true.B; mem.RE := false.B }
-    .otherwise { mem.WE := false.B; mem.RE := true.B }
+  when(valid_up) {
+    when(element_idx_counter_value === 0.U && element_time_counter_value =/= (elem_t.time() - 1).U) {
+      mem.WE := true.B; mem.RE := false.B
+    }
+      .otherwise {
+        mem.WE := false.B; mem.RE := true.B
+      }
+  } .otherwise{ mem.WE := false.B; mem.RE := false.B }
 
   when(element_idx_counter_value === 0.U) { O := I } otherwise { O := dataOut }
 
