@@ -31,9 +31,13 @@ abstract class STTypeDefinition {
   def chiselRepr(): Data
 }
 
+trait NestedSTType[T <: STTypeDefinition] extends STTypeDefinition {
+  val n: Int
+  val t: T
+}
 trait STIntOrBit extends STTypeDefinition
 
-case class TSeq[T <: STTypeDefinition](n: Int, i: Int, t: T) extends STTypeDefinition {
+case class TSeq[T <: STTypeDefinition](n: Int, i: Int, t: T) extends STTypeDefinition with NestedSTType[T] {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
@@ -63,7 +67,7 @@ case class TSeq[T <: STTypeDefinition](n: Int, i: Int, t: T) extends STTypeDefin
   override def chiselRepr(): Data = t.chiselRepr()
 }
 
-case class SSeq[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition {
+case class SSeq[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition with NestedSTType[T] {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
@@ -93,7 +97,7 @@ case class SSeq[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition {
   override def chiselRepr(): Vec[Data] = Vec(n, t.chiselRepr())
 }
 
-case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition {
+case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition with NestedSTType[T] {
   /**
     * Total amount of atoms over the entire time of the ST type
     */

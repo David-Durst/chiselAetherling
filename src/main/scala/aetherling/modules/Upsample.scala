@@ -23,6 +23,8 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
   val (element_time_counter_value, _) = Counter(valid_up, elem_t.time())
   val (element_idx_counter_value, _) =
     Counter(valid_up && (element_time_counter_value === (elem_t.time() - 1).U), n + i)
+  printf("element_time_counter_value: %d\n", element_time_counter_value)
+  printf("element_idx_counter_value: %d\n", element_idx_counter_value)
 
   // Create a synchronous-read, synchronous-write memory (like in FPGAs SRAMs).
   // using memory rather than registers as can be larger and want synthesizer to pick mem or reg
