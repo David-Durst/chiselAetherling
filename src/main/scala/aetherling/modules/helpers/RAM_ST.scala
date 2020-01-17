@@ -32,7 +32,7 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
     ramOutWires(i) := rams(i).read(read_elem_counter.cur_valid, read_elem_counter.valid)
   }
 
-  RDATA := MuxLookup(read_elem_counter, ramOutWires(0), for (i <- 0 to n-1) yield i -> ramOutWires(i))
+  RDATA := MuxLookup(read_elem_counter.cur_valid, ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
 
   def getRAMAddrWidth(n: Int) = max((n-1).U.getWidth, 1).W
 }
