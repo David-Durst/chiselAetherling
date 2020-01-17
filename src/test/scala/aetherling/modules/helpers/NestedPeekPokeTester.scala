@@ -165,4 +165,10 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     case true => BigInt(1)
     case false => BigInt(0)
   }
+
+  def compute_num_atoms_per_sseq_layer(signal: Aggregate): IndexedSeq[Int] = {
+    signal.getElements map compute_num_atoms_per_sseq_layer scanRight(0, )
+  }
+
+  def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = Array(1)
 }

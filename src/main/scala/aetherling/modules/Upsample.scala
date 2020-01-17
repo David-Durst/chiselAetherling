@@ -28,11 +28,15 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
 
   // Create a synchronous-read, synchronous-write memory (like in FPGAs SRAMs).
   // using memory rather than registers as can be larger and want synthesizer to pick mem or reg
-  val mem = SyncReadMem(1, elem_t.chiselRepr())
+  val mem = Module(new RAM_ST(elem_t, 1))
   // Create one port memory for read and write
   val dataOut = Wire(elem_t.chiselRepr())
-  when(element_idx_counter_value === 0.U) { mem.write(0.U, I); dataOut := DontCare }
-    .otherwise( dataOut := mem.read(0.U, valid_up) )
+  mem.WADDR := 0.U
+  mem.RADDR := 0.U
+  mem.WDATA := I
+  dataOut := mem.RDATA
+  when(element_idx_counter_value === 0.U) { mem.WE := true.B; mem.RE := false.B }
+    .otherwise { mem.WE := false.B; mem.RE := true.B }
 
   when(element_idx_counter_value === 0.U) { O := I } otherwise { O := dataOut }
 
