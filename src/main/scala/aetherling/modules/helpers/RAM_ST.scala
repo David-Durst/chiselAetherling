@@ -27,11 +27,11 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
 
   val ramOutWires = (for (_ <- 0 to n-1) yield Wire(t.chiselRepr())).toArray
   for (i <- 0 to (n-1)) {
-    when(i.U === WADDR && write_elem_counter.valid) { rams(i).write(write_elem_counter.cur_valid, WDATA) ; ramOutWires(i) := DontCare }
-        .otherwise { ramOutWires(i) := rams(i).read(read_elem_counter.cur_valid, read_elem_counter.valid) }
+    when(i.U === WADDR && write_elem_counter.valid) { rams(i).write(write_elem_counter.cur_valid, WDATA) }
+    ramOutWires(i) := rams(i).read(read_elem_counter.cur_valid, read_elem_counter.valid)
   }
 
-  RDATA := MuxLookup(RADDR, ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
+  RDATA := MuxLookup(RegNext(RADDR), ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
 
   def getRAMAddrWidth(n: Int) = max((n-1).U.getWidth, 1).W
 }
