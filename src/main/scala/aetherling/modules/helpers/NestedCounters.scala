@@ -6,10 +6,17 @@ import aetherling.types._
 import chisel3._
 import chisel3.util.Counter
 
-class NestedCounters(t: STTypeDefinition, has_cur_valid: Boolean,
+/**
+  * Create a counter that emits value on each valid element of a nested type
+  * @param t - the type
+  * @param has_cur_valid - whether a port should emit an integer of the current valid element
+  * @param valid_down_when_ce_disabled - should this emit valid when on a valid element but CE is enabled
+  */
+class NestedCounters(val t: STTypeDefinition, has_cur_valid: Boolean,
                       valid_down_when_ce_disabled: Boolean) extends MultiIOModule {
   val CE = IO(Input(Bool()))
   val valid = IO(Output(Bool()))
+  // is this the last element of the type
   val last = IO(Output(Bool()))
 
   val inner_nested_counter = Module(new _NestedCounters(t, valid_down_when_ce_disabled))
@@ -30,8 +37,8 @@ class _NestedCounters(t: STTypeDefinition, valid_down_when_ce_disabled: Boolean)
   val last = IO(Output(Bool()))
 
 
-  if (t.isInstanceOf[TSeq]) {
-    val t_tseq = t.asInstanceOf[TSeq]
+  if (t.isInstanceOf[TSeq[_]]) {
+    val t_tseq = t.asInstanceOf[TSeq[STTypeDefinition]]
     val inner_counter = Module(new _NestedCounters(t_tseq.t, valid_down_when_ce_disabled))
     // wrap is when 0 after being n-1, last is when currently n-1
     val (outer_counter_value, _) = Counter(CE && inner_counter.last, t_tseq.n + t_tseq.i)
@@ -39,8 +46,21 @@ class _NestedCounters(t: STTypeDefinition, valid_down_when_ce_disabled: Boolean)
     last := (outer_counter_value === (t_tseq.n + t_tseq.i - 1).U) && inner_counter.last
     valid := (outer_counter_value < t_tseq.n.U) && inner_counter.valid
   }
-  else if (t.isNested()) {
+  else if (t.isInstanceOf[NestedSTType[_]]) {
+    val t_nested = t.asInstanceOf[NestedSTType[STTypeDefinition]]
+    val inner_counter = Module(new _NestedCounters(t_nested.t, valid_down_when_ce_disabled))
 
+    last := inner_counter.last
+    valid := inner_counter.valid
+  }
+  else {
+    last := true.B
+    if (valid_down_when_ce_disabled) {
+      valid := true.B
+    }
+    else {
+      valid := CE
+    }
   }
 
 
