@@ -11,8 +11,7 @@ import chisel3.util.Counter
   * @param t - the type
   * @param valid_down_when_ce_disabled - should this emit valid when on a valid element but CE is enabled
   */
-class NestedCountersWithNumValid(val t: STTypeDefinition, has_cur_valid: Boolean,
-                      valid_down_when_ce_disabled: Boolean) extends MultiIOModule {
+class NestedCountersWithNumValid(val t: STTypeDefinition, valid_down_when_ce_disabled: Boolean) extends MultiIOModule {
   val CE = IO(Input(Bool()))
   val valid = IO(Output(Bool()))
   // is this the last element of the type
