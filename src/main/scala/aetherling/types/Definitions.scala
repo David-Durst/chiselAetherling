@@ -127,7 +127,7 @@ case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinit
   override def chiselRepr(): Data = Vec(n, t.chiselRepr())
 }
 
-case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T1, t1: T1)
+case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T0, t1: T1)
   extends STTypeDefinition {
   /**
     * Total amount of atoms over the entire time of the ST type
