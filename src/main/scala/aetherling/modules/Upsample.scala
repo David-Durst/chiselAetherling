@@ -36,13 +36,10 @@ class UpT(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule  with 
   mem.WDATA := I
   dataOut := mem.RDATA
   when(valid_up) {
-    when(element_idx_counter_value === 0.U && element_time_counter_value =/= (elem_t.time() - 1).U) {
-      mem.WE := true.B; mem.RE := false.B
-    }
-      .otherwise {
-        mem.WE := false.B; mem.RE := true.B
-      }
-  } .otherwise{ mem.WE := false.B; mem.RE := false.B }
+    when(element_idx_counter_value === 0.U) { mem.WE := true.B } .otherwise { mem.WE := false.B }
+    when(element_idx_counter_value =/= 0.U || element_time_counter_value === (elem_t.time() - 1).U) { mem.RE := true.B }
+      .otherwise { mem.RE := false.B }
+  } .otherwise { mem.WE := false.B; mem.RE := false.B }
 
   when(element_idx_counter_value === 0.U) { O := I } otherwise { O := dataOut }
 
