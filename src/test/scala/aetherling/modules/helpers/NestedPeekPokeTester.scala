@@ -191,16 +191,20 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     * The number of UInt, Bool, and Tuple elements per layer of Vec
     * @param signal The nested chisel value to inspect
     */
-  def compute_num_atoms_per_sseq_layer(signal: Aggregate): IndexedSeq[Int] = {
-    val signal_elements = signal.getElements
-    val lower_layer_elements =
-      signal_elements(0).isInstanceOf[Aggregate] match {
-        case true => compute_num_atoms_per_sseq_layer(signal_elements(0).asInstanceOf[Aggregate])
-        case false => compute_num_atoms_per_sseq_layer(signal_elements(0))
+  def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = {
+    signal match {
+      case s: Aggregate =>  {
+        val signal_elements = s.getElements
+        val lower_layer_elements =
+          signal_elements(0).isInstanceOf[Aggregate] match {
+            case true => compute_num_atoms_per_sseq_layer(signal_elements(0).asInstanceOf[Aggregate])
+            case false => compute_num_atoms_per_sseq_layer(signal_elements(0))
+          }
+        val top_layer_num_elements = if (lower_layer_elements.isEmpty) 1 else lower_layer_elements(0)
+        (signal_elements.size * top_layer_num_elements) +: lower_layer_elements
       }
-    val top_layer_num_elements = if (lower_layer_elements.isEmpty) 1 else lower_layer_elements(0)
-    (signal_elements.size * top_layer_num_elements) +: lower_layer_elements
+      case s => Array[Int]()
+    }
   }
 
-  def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = Array[Int]()
 }
