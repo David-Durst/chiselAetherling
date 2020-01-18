@@ -25,7 +25,7 @@ class UnpartitionS(no: Int, ni: Int, elem_t: STTypeDefinition) extends MultiIOMo
 
   for (i <- 0 to no - 1) {
     for (j <- 0 to ni - 1) {
-      I(i*ni + j) := O(i).asInstanceOf[Vec[Data]](j)
+      O(i*ni + j) := I(i).asInstanceOf[Vec[Data]](j)
     }
   }
   valid_down := valid_up
