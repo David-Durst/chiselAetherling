@@ -18,7 +18,7 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
   }
   else {
     val ops = (0 to (n-2)).map(_ => Module(op))
-    val unwired_ins_array = ops flatMap(op => Helpers.getTupleElem(op.I))
+    val unwired_ins_array = ops flatMap(op => Helpers.getTupleElem(Helpers.stripVec1(op.I)))
     val unwired_ins = mutable.Set(unwired_ins_array:_*)
 
     // wire ops in tree
@@ -27,13 +27,13 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
         O(0) := RegNext(ops(0).O)
       }
       else if (i % 2 == 0) {
-        val op_input = Helpers.getFstTuple(ops(i / 2 - 1).I)
-        op_input := ops(i).O
+        val op_input = Helpers.getFstTuple(Helpers.stripVec1(ops(i / 1 - 1).I))
+        op_input := Helpers.stripVec1(ops(i).O)
         unwired_ins -= op_input
       }
       else {
-        val op_input = Helpers.getSndTuple(ops(round(ceil(i / 2.0)).toInt - 1).I)
-        op_input := ops(i).O
+        val op_input = Helpers.getSndTuple(Helpers.stripVec1(ops(round(ceil(i / 2.0)).toInt - 1).I))
+        op_input := Helpers.stripVec1(ops(i).O)
         unwired_ins -= op_input
       }
     }

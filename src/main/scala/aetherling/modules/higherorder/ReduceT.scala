@@ -29,8 +29,8 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     //  (excluding clock 0, but not outputing on that clock as n==1 case handled separately)
     val op_output_or_module_input = Mux(elem_counter_value === 0.U, I, op_inst.O)
     val accum_reg = RegNext(op_output_or_module_input)
-    Helpers.getFstTuple(op_inst.I) := I
-    Helpers.getSndTuple(op_inst.I) := accum_reg
+    Helpers.getFstTuple(Helpers.stripVec1(op_inst.I)) := Helpers.stripVec1(I)
+    Helpers.getSndTuple(Helpers.stripVec1(op_inst.I)) := Helpers.stripVec1(accum_reg)
     undelayed_out := op_inst.O
 
     // finished when elem_counter is n-1 as that is last element and combinational path from op

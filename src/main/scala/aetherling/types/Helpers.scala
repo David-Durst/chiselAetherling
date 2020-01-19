@@ -15,38 +15,8 @@ object Helpers {
     }
   }
 
-  /**
-    * Get the first element of a tuple. If the tuple is nested inside
-    * Vecs of length 1, get the first element with the same nesting.
-    */
-  def getFstTuple(data: Data): Data = {
-    data match {
-      case d: Vec[Data] if d.length == 1 => {
-        val fstWithoutVec1 = getFstTuple(d(0))
-        // wire used to create hardware of desired type
-        val vecWire = Wire(Vec(1, chiselTypeOf(fstWithoutVec1)))
-        vecWire(0) := fstWithoutVec1
-        vecWire
-      }
-      case d => d.asInstanceOf[TupleBundle].t0b
-    }
-  }
-  /**
-    * Get the first element of a tuple. If the tuple is nested inside
-    * Vecs of length 1, get the first element with the same nesting.
-    */
-  def getSndTuple(data: Data): Data = {
-    data match {
-      case d: Vec[Data] if d.length == 1 => {
-        val sndWithoutVec1 = getFstTuple(d(0))
-        // wire used to create hardware of desired type
-        val vecWire = Wire(Vec(1, chiselTypeOf(sndWithoutVec1)))
-        vecWire(0) := sndWithoutVec1
-        vecWire
-      }
-      case d => d.asInstanceOf[TupleBundle].t1b
-    }
-  }
+  def getFstTuple(data: Data): Data = data.asInstanceOf[TupleBundle].t0b
+  def getSndTuple(data: Data): Data = data.asInstanceOf[TupleBundle].t1b
   def getTupleElem(tupleBundle: Data): IndexedSeq[Data] =
     Vector(getFstTuple(tupleBundle), getSndTuple(tupleBundle))
 }
