@@ -91,6 +91,48 @@ class SubNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
 }
 
 /**
+  * Mul two Int atoms with a two cycle delay
+  * @param t the Space-Time Int type (specifies width)
+  */
+class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := RegNext(RegNext(I.t0b.asUInt()) * RegNext(I.t1b.asUInt()))
+  valid_down := RegNext(RegNext(valid_up))
+}
+
+/**
+  * Mul two Int atoms with a two cycle delay with no valid interface
+  * @param t the Space-Time Int type (specifies width)
+  */
+class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := RegNext(RegNext(I.t0b.asUInt()) * RegNext(I.t1b.asUInt()))
+}
+
+/**
+  * Div two Int atoms with a one cycle delay
+  * @param t the Space-Time Int type (specifies width)
+  */
+class Div(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := RegNext(I.t0b.asUInt() / I.t1b.asUInt())
+  valid_down := RegNext(valid_up)
+}
+
+/**
+  * Div two Int atoms with a two cycle delay with no valid interface
+  * @param t the Space-Time Int type (specifies width)
+  */
+class DivNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
+  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val O = IO(Output(t.chiselRepr()))
+  O := RegNext(I.t0b.asUInt() / I.t1b.asUInt())
+}
+
+/**
   * RShift one Int atom by amount set by other Int atom
   * @param t the Space-Time Int type (specifies width)
   */
