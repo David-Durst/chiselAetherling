@@ -8,22 +8,23 @@ import chisel3.util.Counter
 import math._
 import scala.collection.mutable
 
-class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface) extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val I = IO(Input(Vec(n, chiselTypeOf(Helpers.getFstTuple(op.I)))))
-  override val O = IO(Output(Vec(n, chiselTypeOf(op.O))))
+class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDefinition) extends MultiIOModule
+  with UnaryInterface with ValidInterface {
+  override val I = IO(Input(Vec(n, elem_t.chiselRepr())))
+  override val O = IO(Output(Vec(1, elem_t.chiselRepr())))
 
   if (n == 1) {
     O := RegNext(I)
   }
   else {
-    val ops = (0 to (n-1)).map(_ => Module(op))
+    val ops = (0 to (n-2)).map(_ => Module(op))
     val unwired_ins_array = ops flatMap(op => Helpers.getTupleElem(op.I))
     val unwired_ins = mutable.Set(unwired_ins_array:_*)
 
-    // wire ops into tree
-    for (i <- 0 to n - 1) {
+    // wire ops in tree
+    for (i <- 0 to n - 2) {
       if (i == 0) {
-        O := RegNext(ops(0).O)
+        O(0) := RegNext(ops(0).O)
       }
       else if (i % 2 == 0) {
         val op_input = Helpers.getFstTuple(ops(i / 2 - 1).I)

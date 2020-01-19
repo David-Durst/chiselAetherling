@@ -7,12 +7,12 @@ import chisel3._
 import chisel3.util.Counter
 import math._
 import scala.collection.mutable
-class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface) extends MultiIOModule
+class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDefinition) extends MultiIOModule
   with UnaryInterface with ValidInterface {
-  override val I = IO(Input(chiselTypeOf(Helpers.getFstTuple(op.I))))
-  override val O = IO(Output(chiselTypeOf(op.O)))
+  override val I = IO(Input(elem_t.chiselRepr()))
+  override val O = IO(Output(elem_t.chiselRepr()))
 
-  val undelayed_out = Wire(chiselTypeOf(op.O))
+  val undelayed_out = Wire(elem_t.chiselRepr())
   if (n == 1) {
     undelayed_out := I
     valid_down := RegNext(valid_up)
@@ -35,7 +35,10 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface) extends 
 
     // finished when elem_counter is n-1 as that is last element and combinational path from op
     // reg it so that no combinational path out of reduce
-    valid_down := RegNext(elem_counter_value === (n-1).U)
+    // once valid always valid, following the aetherling valid interface
+    val valid_reg = Reg(Bool())
+    valid_reg := valid_reg || (elem_counter_value === (n-1).U)
+    valid_down := valid_reg
   }
 
   O := RegNext(undelayed_out)
