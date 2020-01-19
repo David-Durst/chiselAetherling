@@ -20,13 +20,15 @@ object Helpers {
     * Vecs of length 1, get the first element with the same nesting.
     */
   def getFstTuple(data: Data): Data = {
-    if (data.isInstanceOf[Vec[Data]] && data.asInstanceOf[Vec[Data]].length == 1) {
-      // used to create hardware of desired output type
-      val vecWire = Wire(get)
-      data.asInstanceOf[Vec[Data]].map(getFstTuple)
-    }
-    else {
-      data.asInstanceOf[TupleBundle].t0b
+    data match {
+      case d: Vec[Data] if d.length == 1 => {
+        val fstWithoutVec1 = getFstTuple(d(0))
+        // wire used to create hardware of desired type
+        val vecWire = Wire(Vec(1, chiselTypeOf(fstWithoutVec1)))
+        vecWire(0) := fstWithoutVec1
+        vecWire
+      }
+      case d => d.asInstanceOf[TupleBundle].t0b
     }
   }
   /**
@@ -34,11 +36,15 @@ object Helpers {
     * Vecs of length 1, get the first element with the same nesting.
     */
   def getSndTuple(data: Data): Data = {
-    if (data.isInstanceOf[Vec[Data]] && data.asInstanceOf[Vec[Data]].length == 1) {
-      Vec(1, getSndTuple(data.asInstanceOf[Vec[Data]](0)))
-    }
-    else {
-      data.asInstanceOf[TupleBundle].t1b
+    data match {
+      case d: Vec[Data] if d.length == 1 => {
+        val sndWithoutVec1 = getFstTuple(d(0))
+        // wire used to create hardware of desired type
+        val vecWire = Wire(Vec(1, chiselTypeOf(sndWithoutVec1)))
+        vecWire(0) := sndWithoutVec1
+        vecWire
+      }
+      case d => d.asInstanceOf[TupleBundle].t1b
     }
   }
   def getTupleElem(tupleBundle: Data): IndexedSeq[Data] =
