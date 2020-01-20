@@ -6,6 +6,7 @@ import chisel3.iotesters.PeekPokeTester
 import chisel3.{Aggregate, Bool, Data, MultiIOModule, UInt}
 
 abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends PeekPokeTester(c) {
+  val int_to_ignore = 253
   def poke_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
     values(0) match {
       case v: IndexedSeq[_] =>
@@ -116,13 +117,19 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def expect_nested(signal: Data, value: Boolean): Unit = {
-    expect(signal.asUInt(), boolean2BigInt(value))
+    if (value != int_to_ignore) {
+      expect(signal.asUInt(), boolean2BigInt(value))
+    }
   }
   def expect_nested(signal: Data, value: Int): Unit = {
-    expect(signal.asUInt(), BigInt(value))
+    if (value != int_to_ignore) {
+      expect(signal.asUInt(), BigInt(value))
+    }
   }
   def expect_nested(signal: Data, value: BigInt): Unit = {
-    expect(signal.asUInt(), value)
+    if (value != int_to_ignore) {
+      expect(signal.asUInt(), value)
+    }
   }
 
   def peek_binary_module(t: MultiIOModule with BinaryInterface with ValidInterface): Unit = {

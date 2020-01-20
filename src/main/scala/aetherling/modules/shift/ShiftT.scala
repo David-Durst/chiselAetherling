@@ -21,7 +21,7 @@ class ShiftT(n: Int, i: Int, shift_amount: Int, elem_t: STTypeDefinition) extend
 
 
   if (elem_t.validClocks() == 1 && shift_amount == 1) {
-    O := RegNext((0 to elem_t.time() - 1).foldLeft(I){ case (next_to_shift, _) => RegNext(next_to_shift)})
+    O := (0 to elem_t.time() - 1).foldLeft(I){ case (next_to_shift, _) => RegNext(next_to_shift)}
   }
   else {
     // write and read from same location offset by 1 clock cycle
@@ -39,16 +39,18 @@ class ShiftT(n: Int, i: Int, shift_amount: Int, elem_t: STTypeDefinition) extend
     val value_store = Module(new RAM_ST(elem_t, shift_amount))
 
     val next_ram_addr = Module(new NestedCounters(elem_t, valid_down_when_ce_disabled = false))
-    val (ram_addr_value, _) = Counter(valid_up && next_ram_addr.last, shift_amount)
+    next_ram_addr.CE := valid_up
+    val (ram_write_addr_value, _) = Counter(valid_up && next_ram_addr.last, shift_amount)
 
-    value_store.WADDR := ram_addr_value
-    value_store.RADDR := RegNext(ram_addr_value)
+    value_store.WADDR := ram_write_addr_value
+    when (ram_write_addr_value === (shift_amount-1).U) { value_store.RADDR := 0.U }
+      .otherwise { value_store.RADDR := ram_write_addr_value + 1.U }
     value_store.WE := valid_up
-    value_store.RE := RegNext(valid_up)
+    value_store.RE := valid_up
     value_store.WDATA := I
     O := value_store.RDATA
   }
 
 
-  valid_down := RegNext(RegNext(valid_up))
+  valid_down := valid_up
 }
