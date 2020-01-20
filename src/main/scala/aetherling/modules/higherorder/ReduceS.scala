@@ -40,7 +40,7 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
 
     // wire inputs to tree
     for ((unwired_in, i) <- unwired_ins.view.zipWithIndex) {
-      unwired_in := I(i)
+      unwired_in := Helpers.stripVec1(I(i))
     }
   }
 
