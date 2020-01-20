@@ -1,5 +1,4 @@
 // See README.md for license details.
-
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   Seq() ++ {
     // If we're building with Scala > 2.11, enable the compile option
@@ -51,3 +50,7 @@ libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
+assemblyJarName in assembly := "aetherling.jar"
+Project.inConfig(Test)(baseAssemblySettings)
+assembly / test := {}
+Test / assembly / test := {}
