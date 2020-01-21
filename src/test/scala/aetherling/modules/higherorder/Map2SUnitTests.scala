@@ -13,7 +13,7 @@ class Map2STupleUnitTester(c: Map2S) extends NestedPeekPokeTester(c) {
     println(s"in0: ${peek_str(c.I0)}")
     println(s"in1: ${peek_str(c.I1)}")
     println(s"out: ${peek_str(c.O)}")
-    expect_nested(c.O, (0 to 3).map(j => Array(i*j, i*j+17)))
+    expect_nested(c.O, (0 to 3).map(j => IndexedSeq(i*j, i*j+17)))
   }
 }
 
