@@ -23,15 +23,13 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
   write_elem_counter.CE := WE
   read_elem_counter.CE := RE
 
-  val rams = for (_ <- 0 to n-1) yield SyncReadMem(t.validClocks(), t.chiselRepr())
+  println(s"Made a memory of size ${t.validClocks()*n} with elements of type ${t.chiselRepr()}")
+  val waddr_offsets_rom = VecInit(for (i <- 0 to n-1) yield (i * t.validClocks()).U)
+  val raddr_offsets_rom = VecInit(for (i <- 0 to n-1) yield (i * t.validClocks()).U)
+  val ram = SyncReadMem(t.validClocks()*n, t.chiselRepr())
 
-  val ramOutWires = (for (_ <- 0 to n-1) yield Wire(t.chiselRepr())).toArray
-  for (i <- 0 to (n-1)) {
-    when(i.U === WADDR && write_elem_counter.valid) { rams(i).write(write_elem_counter.cur_valid, WDATA) }
-    ramOutWires(i) := rams(i).read(read_elem_counter.cur_valid, read_elem_counter.valid)
-  }
-
-  RDATA := MuxLookup(RegNext(RADDR), ramOutWires(0), for (i <- 0 to n-1) yield i.U -> ramOutWires(i))
+  when(write_elem_counter.valid) { ram.write(waddr_offsets_rom(WADDR) + write_elem_counter.cur_valid, WDATA) }
+  RDATA := ram.read(raddr_offsets_rom(RADDR) + read_elem_counter.cur_valid, read_elem_counter.valid)
 
   def getRAMAddrWidth(n: Int) = max((n-1).U.getWidth, 1).W
 }

@@ -19,6 +19,7 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
     val internalDelayCounter = Counter(delay + 1)
     val readCounter = Counter(delay + 1)
     val writeCounter = Counter(delay + 1)
+    println(s"Made memory of size ${delay + 1} with elements of type ${t.chiselRepr()}")
     val fifoBuffer = SyncReadMem(delay + 1, t.chiselRepr())
 
     /*
