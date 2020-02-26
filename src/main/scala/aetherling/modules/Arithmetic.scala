@@ -49,6 +49,44 @@ class NotNoValid() extends MultiIOModule with UnaryInterface {
 }
 
 /**
+  * And of two Bit atoms
+  */
+class And() extends MultiIOModule with UnaryInterface with ValidInterface {
+  override val I = IO(Input(STAtomTuple(STBit(), STBit()).chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := I.t0b.asInstanceOf[Bool] && I.t1b.asInstanceOf[Bool]
+  valid_down := valid_up
+}
+
+/**
+  * And of two Bit atoms with no valid interface
+  */
+class AndNoValid() extends MultiIOModule with UnaryInterface {
+  override val I = IO(Input(STAtomTuple(STBit(), STBit()).chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := I.t0b.asInstanceOf[Bool] && I.t1b.asInstanceOf[Bool]
+}
+
+/**
+  * Or of two Bit atoms
+  */
+class Or() extends MultiIOModule with UnaryInterface with ValidInterface {
+  override val I = IO(Input(STAtomTuple(STBit(), STBit()).chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := I.t0b.asInstanceOf[Bool] || I.t1b.asInstanceOf[Bool]
+  valid_down := valid_up
+}
+
+/**
+  * Or of two Bit atoms with no valid interface
+  */
+class OrNoValid() extends MultiIOModule with UnaryInterface {
+  override val I = IO(Input(STAtomTuple(STBit(), STBit()).chiselRepr()))
+  override val O = IO(Output(STBit().chiselRepr()))
+  O := I.t0b.asInstanceOf[Bool] || I.t1b.asInstanceOf[Bool]
+}
+
+/**
   * Add two Int atoms
   * @param t the Space-Time Int type (specifies width)
   */
