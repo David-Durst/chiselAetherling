@@ -34,7 +34,7 @@ class ArithmeticTester extends ChiselFlatSpec {
   }
 
   "Abs" should "take absolute value of an int correctly" in {
-    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Abs(STInt(8, signed = false))) {
+    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new Abs(STInt(8, signed = true))) {
       c => new AbsUnitTester(c)
     } should be(true)
   }

@@ -20,7 +20,7 @@ class MapSAbsUnitTester(c: MapS) extends PeekPokeTester(c) {
 
 class MapSTester extends ChiselFlatSpec {
   "MapS" should "take abs of four ints per clock correctly" in {
-    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new MapS(4, new Abs(STInt(8, signed = false)))) {
+    iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new MapS(4, new Abs(STInt(8, signed = true)))) {
       c => new MapSAbsUnitTester(c)
     } should be(true)
   }
