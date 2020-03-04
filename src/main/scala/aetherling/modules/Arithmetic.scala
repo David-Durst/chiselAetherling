@@ -12,7 +12,8 @@ class Abs(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
   override val I = IO(Input(t.chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   val out_reg = Reg(t.chiselRepr())
-  when(I.asSInt() < 0.S) { out_reg := 0.U - I }.otherwise( out_reg := I )
+  when(I.asInstanceOf[SInt] < 0.S) { out_reg := 0.S - I.asInstanceOf[SInt] }
+    .otherwise( out_reg := I.asInstanceOf[SInt] )
   O := out_reg
   valid_down := RegNext(valid_up)
 }
@@ -25,7 +26,8 @@ class AbsNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
   override val I = IO(Input(t.chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   val out_reg = Reg(t.chiselRepr())
-  when(I.asSInt() < 0.S) { out_reg := 0.U - I }.otherwise( out_reg := I )
+  when(I.asInstanceOf[SInt] < 0.S) { out_reg := 0.S - I.asInstanceOf[SInt] }
+    .otherwise( out_reg := I.asInstanceOf[SInt] )
   O := out_reg
 }
 

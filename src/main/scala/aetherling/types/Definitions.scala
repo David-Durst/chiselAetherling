@@ -158,7 +158,7 @@ case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T0, t
   override def chiselRepr(): TupleBundle = new TupleBundle(t0, t1)
 }
 
-case class STInt(width: Int) extends STTypeDefinition with STIntOrBit {
+case class STInt(width: Int, signed: Boolean = false) extends STTypeDefinition with STIntOrBit {
   /**
     * Total amount of atoms over the entire time of the ST type
     */
@@ -185,7 +185,14 @@ case class STInt(width: Int) extends STTypeDefinition with STIntOrBit {
     * A Chisel representation of this type as a nested array of bits.
     * Chisel doesn't acount for time.
     */
-  override def chiselRepr(): UInt = UInt(width.W)
+  override def chiselRepr(): Data = {
+    if (signed) {
+      SInt(width.W)
+    }
+    else {
+      UInt(width.W)
+    }
+  }
 }
 
 case class STBit() extends STTypeDefinition with STIntOrBit {
