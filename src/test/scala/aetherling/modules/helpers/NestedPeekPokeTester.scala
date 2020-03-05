@@ -61,6 +61,9 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     if (signal.isInstanceOf[SInt]) {
       poke(signal.asInstanceOf[SInt], boolean2BigInt(value))
     }
+    else if (signal.isInstanceOf[Aggregate]) {
+      poke_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
+    }
     else {
       poke(signal.asInstanceOf[UInt], boolean2BigInt(value))
     }
@@ -70,6 +73,9 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     if (signal.isInstanceOf[SInt]) {
       poke(signal.asInstanceOf[SInt], BigInt(value))
     }
+    else if (signal.isInstanceOf[Aggregate]) {
+      poke_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
+    }
     else {
       poke(signal.asInstanceOf[UInt], BigInt(value))
     }
@@ -78,6 +84,9 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   def poke_nested(signal: Data, value: BigInt): Unit = {
     if (signal.isInstanceOf[SInt]) {
       poke(signal.asInstanceOf[SInt], value)
+    }
+    else if (signal.isInstanceOf[Aggregate]) {
+      poke_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
     }
     else {
       poke(signal.asInstanceOf[UInt], value)
@@ -136,30 +145,39 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   def expect_nested(signal: Data, value: Boolean): Unit = {
     if (value != int_to_ignore) {
       if (signal.isInstanceOf[SInt]) {
-        poke(signal.asInstanceOf[SInt], boolean2BigInt(value))
+        expect(signal.asInstanceOf[SInt], boolean2BigInt(value))
+      }
+      else if (signal.isInstanceOf[Aggregate]) {
+        expect_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
       }
       else {
-        poke(signal.asInstanceOf[UInt], boolean2BigInt(value))
+        expect(signal.asInstanceOf[UInt], boolean2BigInt(value))
       }
     }
   }
   def expect_nested(signal: Data, value: Int): Unit = {
     if (value != int_to_ignore) {
       if (signal.isInstanceOf[SInt]) {
-        poke(signal.asInstanceOf[SInt], BigInt(value))
+        expect(signal.asInstanceOf[SInt], BigInt(value))
+      }
+      else if (signal.isInstanceOf[Aggregate]) {
+        expect_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
       }
       else {
-        poke(signal.asInstanceOf[UInt], BigInt(value))
+        expect(signal.asInstanceOf[UInt], BigInt(value))
       }
     }
   }
   def expect_nested(signal: Data, value: BigInt): Unit = {
     if (value != int_to_ignore) {
       if (signal.isInstanceOf[SInt]) {
-        poke(signal.asInstanceOf[SInt], value)
+        expect(signal.asInstanceOf[SInt], value)
+      }
+      else if (signal.isInstanceOf[Aggregate]) {
+        expect_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
       }
       else {
-        poke(signal.asInstanceOf[UInt], value)
+        expect(signal.asInstanceOf[UInt], value)
       }
     }
   }
