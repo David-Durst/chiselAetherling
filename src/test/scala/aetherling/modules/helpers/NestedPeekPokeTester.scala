@@ -1,5 +1,6 @@
 package aetherling.modules.helpers
 
+import Chisel.SInt
 import aetherling.types.TupleBundle
 import chisel3.experimental.DataMirror
 import chisel3.iotesters.PeekPokeTester
@@ -57,14 +58,30 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
   }
 
   def poke_nested(signal: Data, value: Boolean): Unit = {
-    poke(signal.asUInt(), boolean2BigInt(value))
+    if (signal.isInstanceOf[SInt]) {
+      poke(signal.asInstanceOf[SInt], boolean2BigInt(value))
+    }
+    else {
+      poke(signal.asInstanceOf[UInt], boolean2BigInt(value))
+    }
   }
 
   def poke_nested(signal: Data, value: Int): Unit = {
-    poke(signal.asUInt(), BigInt(value))
+    if (signal.isInstanceOf[SInt]) {
+      poke(signal.asInstanceOf[SInt], BigInt(value))
+    }
+    else {
+      poke(signal.asInstanceOf[UInt], BigInt(value))
+    }
   }
+
   def poke_nested(signal: Data, value: BigInt): Unit = {
-    poke(signal.asUInt(), value)
+    if (signal.isInstanceOf[SInt]) {
+      poke(signal.asInstanceOf[SInt], value)
+    }
+    else {
+      poke(signal.asInstanceOf[UInt], value)
+    }
   }
 
   def expect_nested(signal: TupleBundle, values: IndexedSeq[_]): Unit = {
@@ -118,17 +135,32 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def expect_nested(signal: Data, value: Boolean): Unit = {
     if (value != int_to_ignore) {
-      expect(signal.asUInt(), boolean2BigInt(value))
+      if (signal.isInstanceOf[SInt]) {
+        poke(signal.asInstanceOf[SInt], boolean2BigInt(value))
+      }
+      else {
+        poke(signal.asInstanceOf[UInt], boolean2BigInt(value))
+      }
     }
   }
   def expect_nested(signal: Data, value: Int): Unit = {
     if (value != int_to_ignore) {
-      expect(signal.asUInt(), BigInt(value))
+      if (signal.isInstanceOf[SInt]) {
+        poke(signal.asInstanceOf[SInt], BigInt(value))
+      }
+      else {
+        poke(signal.asInstanceOf[UInt], BigInt(value))
+      }
     }
   }
   def expect_nested(signal: Data, value: BigInt): Unit = {
     if (value != int_to_ignore) {
-      expect(signal.asUInt(), value)
+      if (signal.isInstanceOf[SInt]) {
+        poke(signal.asInstanceOf[SInt], value)
+      }
+      else {
+        poke(signal.asInstanceOf[UInt], value)
+      }
     }
   }
 
@@ -164,6 +196,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case s: TupleBundle => s"Tuple(${peek_str(s.t0b)}, ${peek_str(s.t1b)})"
       case s: Aggregate => s"Vec(${s.getElements.map(peek_str).reduce((l,r) => l + ", " + r)})"
       case s: UInt => peek(s).toString
+      case s: SInt => peek(s).toString
       case s => s"Cannot peek_str $s which has class ${s.getClass}"
     }
   }
