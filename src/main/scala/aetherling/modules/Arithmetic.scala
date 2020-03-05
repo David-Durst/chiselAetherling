@@ -166,6 +166,7 @@ class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O
+    inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 8) {
     Module(new BlackBoxMulInt8)
