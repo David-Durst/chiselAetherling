@@ -3,6 +3,10 @@ package aetherling.modules
 import aetherling.modules.helpers._
 import aetherling.types._
 import chisel3._
+import chisel3.util.HasBlackBoxResource
+import chisel3.experimental.DataMirror
+
+import scala.io.Source
 
 /**
   * Abs of an Int atom
@@ -157,13 +161,24 @@ class SubNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
 class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
-  if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] * I.t1b.asInstanceOf[SInt]
+  if (!t.signed && t.width == 8) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O
+  }
+  else if (t.signed && t.width == 8) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O
   }
   else {
-    O := I.t0b.asUInt() * I.t1b.asUInt()
+    ???
   }
-  valid_down := RegNext(RegNext(valid_up))
+
+  valid_down := RegNext(RegNext(RegNext(valid_up)))
 }
 
 /**
@@ -173,14 +188,42 @@ class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
 class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
-  if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] * I.t1b.asInstanceOf[SInt]
+  if (!t.signed && t.width == 8) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O
+  }
+  else if (t.signed && t.width == 8) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O
   }
   else {
-    O := I.t0b.asUInt() * I.t1b.asUInt()
+    ???
   }
 }
 
+class BlackBoxMulUInt8 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(UInt(8.W))
+    val I1 = Input(UInt(8.W))
+    val O = Output(UInt(8.W))
+    val clock = Input(Clock())
+  })
+  addResource("/verilogAetherling/mul.v")
+}
+
+class BlackBoxMulInt8 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(SInt(8.W))
+    val I1 = Input(SInt(8.W))
+    val O = Output(SInt(8.W))
+  })
+  addResource("verilogAetherling/mul.v")
+}
 /**
   * Div two Int atoms with a one cycle delay
   * @param t the Space-Time Int type (specifies width)

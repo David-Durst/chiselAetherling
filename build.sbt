@@ -53,3 +53,5 @@ assemblyJarName in assembly := "aetherling.jar"
 Project.inConfig(Test)(baseAssemblySettings)
 assembly / test := {}
 Test / assembly / test := {}
+//resourceDirectory in Compile := file(".") / "./src/main/resources"
+//resourceDirectory in Runtime := file(".") / "./src/main/resources"

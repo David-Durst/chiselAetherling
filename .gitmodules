@@ -1,0 +1,3 @@
+[submodule "src/main/resources/verilogAetherling"]
+	path = src/main/resources/verilogAetherling
+	url = https://github.com/David-Durst/verilogAetherling.git
