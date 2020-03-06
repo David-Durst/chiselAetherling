@@ -264,10 +264,20 @@ class RShift(t: STInt) extends MultiIOModule with UnaryInterface with ValidInter
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt
+    if (t.width >= 20) {
+      O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt
+    }
   }
   else {
-    O := I.t0b.asUInt() >> I.t1b.asUInt()
+    if (t.width >= 20) {
+      O := I.t0b.asUInt() >> I.t1b.asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asUInt() >> I.t1b.asUInt()
+    }
   }
   valid_down := valid_up
 }
@@ -280,10 +290,20 @@ class RShiftNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt
+    if (t.width >= 20) {
+      O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asInstanceOf[SInt] >> I.t1b.asInstanceOf[SInt].asUInt
+    }
   }
   else {
-    O := I.t0b.asUInt() >> I.t1b.asUInt()
+    if (t.width >= 20) {
+      O := I.t0b.asUInt() >> I.t1b.asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asUInt() >> I.t1b.asUInt()
+    }
   }
 }
 
@@ -295,10 +315,20 @@ class LShift(t: STInt) extends MultiIOModule with UnaryInterface with ValidInter
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt
+    if (t.width >= 20) {
+      O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt
+    }
   }
   else {
-    O := I.t0b.asUInt() << I.t1b.asUInt()
+    if (t.width >= 20) {
+      O := I.t0b.asUInt() << I.t1b.asUInt()(18,0)
+    }
+    else {
+      O := I.t0b.asUInt() << I.t1b.asUInt()
+    }
   }
   valid_down := valid_up
 }
@@ -311,10 +341,20 @@ class LShiftNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
   override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
   if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt
+    if (t.width > 20) {
+      O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt()(19,0)
+    }
+    else {
+      O := I.t0b.asInstanceOf[SInt] << I.t1b.asInstanceOf[SInt].asUInt
+    }
   }
   else {
-    O := I.t0b.asUInt() << I.t1b.asUInt()
+    if (t.width > 20) {
+      O := I.t0b.asUInt() << I.t1b.asUInt()(19,0)
+    }
+    else {
+      O := I.t0b.asUInt() << I.t1b.asUInt()
+    }
   }
 }
 
