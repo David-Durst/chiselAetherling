@@ -39,5 +39,5 @@ class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
   }
 
   O := RegNext(MuxLookup(bank_counter_value, mux_input_wire(0), for (i <- 0 to n-1) yield i.U -> mux_input_wire(i)))
-  valid_down := RegNext(valid_up)
+  valid_down := RegNext(valid_up, false.B)
 }

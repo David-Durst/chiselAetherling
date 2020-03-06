@@ -12,7 +12,7 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
   if (delay == 1) {
     val dataReg = RegNext(I)
     O := dataReg
-    val validReg = RegNext(valid_up)
+    val validReg = RegNext(valid_up, false.B)
     valid_down := validReg
   }
   else {

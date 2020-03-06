@@ -19,7 +19,7 @@ class Abs(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
   when(I.asInstanceOf[SInt] < 0.S) { out_reg := 0.S - I.asInstanceOf[SInt] }
     .otherwise( out_reg := I.asInstanceOf[SInt] )
   O := out_reg
-  valid_down := RegNext(valid_up)
+  valid_down := RegNext(valid_up, false.B)
 }
 
 /**
@@ -179,7 +179,7 @@ class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
     ???
   }
 
-  valid_down := RegNext(RegNext(RegNext(valid_up)))
+  valid_down := RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B)
 }
 
 /**
@@ -238,7 +238,7 @@ class Div(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
   else {
     O := I.t0b.asUInt() / I.t1b.asUInt()
   }
-  valid_down := RegNext(valid_up)
+  valid_down := RegNext(valid_up, false.B)
 }
 
 /**

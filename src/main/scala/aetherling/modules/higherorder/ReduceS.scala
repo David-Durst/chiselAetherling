@@ -44,5 +44,5 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
     }
   }
 
-  valid_down := RegNext(valid_up)
+  valid_down := RegNext(valid_up, false.B)
 }
