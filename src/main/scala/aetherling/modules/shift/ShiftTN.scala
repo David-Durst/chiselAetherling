@@ -46,7 +46,6 @@ class ShiftTN(no: Int, nis: IndexedSeq[Int], io: Int, iis: IndexedSeq[Int],
 
     val next_ram_addr = Module(new NestedCounters(elem_t, valid_down_when_ce_disabled = false))
     next_ram_addr.CE := valid_up
-    val (ram_write_addr_value, _) = Counter(valid_up && next_ram_addr.last, shift_amount)
 
     // this handles invalid clocks of inner TSeq
     // it matters that handle inner invalid clocks because we preserve
@@ -59,6 +58,7 @@ class ShiftTN(no: Int, nis: IndexedSeq[Int], io: Int, iis: IndexedSeq[Int],
     }
     val inner_valid = Module(new NestedCounters(inner_valid_t, valid_down_when_ce_disabled = true))
     inner_valid.CE := valid_up && next_ram_addr.last
+    val (ram_write_addr_value, _) = Counter(valid_up && next_ram_addr.last && inner_valid.valid, shift_amount)
 
     value_store.WADDR := ram_write_addr_value
     when (ram_write_addr_value === (shift_amount-1).U) { value_store.RADDR := 0.U }
