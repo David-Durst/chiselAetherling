@@ -8,7 +8,7 @@ import chisel3.util.{Counter, MuxLookup}
 
 class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
   with UnaryInterface with ValidInterface {
-  val I = IO(Output(TSeq(1, n + i - 1, SSeq_Tuple(n, elem_t)).chiselRepr()))
+  val I = IO(Input(TSeq(1, n + i - 1, SSeq_Tuple(n, elem_t)).chiselRepr()))
   val O = IO(Output(TSeq(n, i, elem_t).chiselRepr()))
 
   val elem_counter = Module(new NestedCountersWithNumValid(elem_t, false))
@@ -31,9 +31,9 @@ class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
       val regs = for (_ <- 0 to n-2) yield Reg(elem_t.chiselRepr())
       val (read_bank_counter_value, _) = Counter(valid_up, n)
 
-      for (i <- 1 to n-1) {
+      for (i <- 0 to n-2) {
         when (read_bank_counter_value === 0.U && valid_up) { regs(i) := I.asInstanceOf[Vec[Data]](i)}
-        mux_input_wire(i-1) := regs(i)
+        mux_input_wire(i+1) := regs(i)
       }
     }
   }
