@@ -20,11 +20,13 @@ class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
 
   if (n > 1) {
     if (elem_t.validClocks() > 1) {
-      val rams = for (_ <- 1 to n-1) yield SyncReadMem(elem_t.validClocks(), elem_t.chiselRepr())
+      val rams = for (_ <- 0 to n-2) yield SyncReadMem(elem_t.validClocks(), elem_t.chiselRepr())
 
-      for (i <- 1 to (n-1)) {
-        when(bank_counter_value === 0.U && valid_up) { rams(i).write(elem_counter.cur_valid, I.asInstanceOf[Vec[Data]](i)) }
-            .otherwise { mux_input_wire(i-1) := rams(i).read(elem_counter.cur_valid, valid_up) }
+      for (i <- 0 to (n-2)) {
+        when(bank_counter_value === 0.U && valid_up) {
+          rams(i).write(elem_counter.cur_valid, I.asInstanceOf[Vec[Data]](i))
+          mux_input_wire(i+1) := DontCare
+        } .otherwise { mux_input_wire(i+1) := rams(i).read(elem_counter.cur_valid, valid_up) }
       }
     }
     else {

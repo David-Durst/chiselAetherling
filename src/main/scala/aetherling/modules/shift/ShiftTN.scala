@@ -19,8 +19,9 @@ import chisel3.util.Counter
 class ShiftTN(no: Int, nis: IndexedSeq[Int], io: Int, iis: IndexedSeq[Int],
               shift_amount: Int, elem_t: STTypeDefinition) extends MultiIOModule
   with UnaryInterface with ValidInterface {
+  require(shift_amount >= 0, "shift_amount must be non-negative")
   var t = elem_t
-  for (i <- nis.length - 1 to 0) {
+  for (i <- nis.length - 1 to 0 by -1) {
     t = TSeq(nis(i), iis(i), t)
   }
   val I = IO(Input(TSeq(no, io, t).chiselRepr()))
@@ -53,7 +54,7 @@ class ShiftTN(no: Int, nis: IndexedSeq[Int], io: Int, iis: IndexedSeq[Int],
     // emitted until next valid. Draw ShiftT of two TSeq 2 1 Int vs ShiftTT of one TSeq 2 0 (TSeq 2 1 Int)
     // to see and example
     var inner_valid_t = elem_t
-    for (i <- nis.length - 1 to 0) {
+    for (i <- nis.length - 1 to 0 by -1) {
       inner_valid_t = TSeq(nis(i), iis(i), inner_valid_t)
     }
     val inner_valid = Module(new NestedCounters(inner_valid_t, valid_down_when_ce_disabled = true))

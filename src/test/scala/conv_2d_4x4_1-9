@@ -1,0 +1,202 @@
+import aetherling.modules.helpers.GlobalValues.undef
+import aetherling.modules.helpers._
+import aetherling.modules.higherorder._
+import aetherling.modules.shift._
+import aetherling.types._
+import chisel3._
+import spray.json.DefaultJsonProtocol._
+import spray.json._
+
+import scala.io.Source
+
+
+class Module_0() extends MultiIOModule  with UnaryInterface with ValidInterface {
+    val I = IO(Input(TSeq(3, 0, TSeq(3, 0, STInt(8, false))).chiselRepr()))
+    val O = IO(Output(TSeq(1, 2, TSeq(1, 2, STInt(8, false))).chiselRepr()))
+    val (const146_O, const146_valid_down) = Const(TSeq(3, 0, TSeq(3, 0, STInt(8, false))), Const.make_vec(0.U(8.W),1.U(8.W),0.U(8.W),1.U(8.W),2.U(8.W),1.U(8.W),0.U(8.W),1.U(8.W),0.U(8.W)), 3, valid_up)
+    val n105 = Module(new Map2T(new Map2T(new AtomTuple(STInt(8, false), STInt(8, false)))))
+    n105.I0 := I
+    n105.I1 := const146_O
+    n105.valid_up := valid_up & const146_valid_down
+    val n116 = Module(new MapT(new MapT(new LShift(STInt(8, false)))))
+    n116.I := n105.O
+    n116.valid_up := n105.valid_down
+    val n121 = Module(new MapT(new ReduceT(3, 0, new AddNoValid(STInt(8, false)), STInt(8, false))))
+    n121.I := n116.O
+    n121.valid_up := n116.valid_down
+    val n126 = Module(new ReduceT(3, 0, new MapTNoValid(new AddNoValid(STInt(8, false))), TSeq(1, 2, STInt(8, false))))
+    n126.I := n121.O
+    n126.valid_up := n121.valid_down
+    val (const147_O, const147_valid_down) = Const(TSeq(1, 2, TSeq(1, 2, STInt(8, false))), Const.make_vec(4.U(8.W),undef,undef,undef,undef,undef,undef,undef,undef), 13, valid_up)
+    val n129 = Module(new Map2T(new Map2T(new AtomTuple(STInt(8, false), STInt(8, false)))))
+    n129.I0 := n126.O
+    n129.I1 := const147_O
+    n129.valid_up := n126.valid_down & const147_valid_down
+    val n140 = Module(new MapT(new MapT(new RShift(STInt(8, false)))))
+    n140.I := n129.O
+    n140.valid_up := n129.valid_down
+    O := n140.O
+    valid_down := n140.valid_down
+}
+
+class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
+    val I = IO(Input(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))).chiselRepr()))
+    val O = IO(Output(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))).chiselRepr()))
+    val n2_shift_I = IO(Output(STInt(8, false).chiselRepr()))
+    val n2_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_shift_I = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_valid_down = IO(Output(STBit().chiselRepr()))
+    val n66_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n66_valid_down = IO(Output(STBit().chiselRepr()))
+    val ser_91_I = IO(Output(SSeq(3, STInt(8, false)).chiselRepr()))
+    val ser_91_O = IO(Output(STInt(8, false).chiselRepr()))
+    val ser_101_I = IO(Output(SSeq(3, STInt(8, false)).chiselRepr()))
+    val ser_101_O = IO(Output(STInt(8, false).chiselRepr()))
+    val mod_0_in = IO(Output(STInt(8, false).chiselRepr()))
+    val n1 = Module(new FIFO(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), 1))
+    n1.I := I
+    n1.valid_up := valid_up
+    val n2 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 4, STInt(8, false)))
+    n2.I := n1.O
+    n2_shift_I := n1.O
+    n2_shift_O := n2.O
+    n2.valid_up := n1.valid_down
+    val n3 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 4, STInt(8, false)))
+    n3.I := n2.O
+    n3.valid_up := n2.valid_down
+    val n4 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n4.I := n3.O
+    n4.valid_up := n3.valid_down
+    val n5 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n5.I := n4.O
+    n5.valid_up := n4.valid_down
+    val n6 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleCreator(STInt(8, false))))))
+    n6.I0 := n5.O
+    n6.I1 := n4.O
+    n6.valid_up := n5.valid_down & n4.valid_down
+    val n16 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleAppender(STInt(8, false), 2)))))
+    n16.I0 := n6.O
+    n16.I1 := n3.O
+    n16.valid_up := n6.valid_down & n3.valid_down
+    val n30 = Module(new MapT(new MapT(new Serialize(3, 0, STInt(8, false)))))
+    n30.I := n16.O
+    n30.valid_up := n16.valid_down
+    val n31 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n31.I := n2.O
+    n31.valid_up := n2.valid_down
+    val n32 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n32.I := n31.O
+    n32.valid_up := n31.valid_down
+    val n33 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleCreator(STInt(8, false))))))
+    n33.I0 := n32.O
+    n33.I1 := n31.O
+    n33.valid_up := n32.valid_down & n31.valid_down
+    val n43 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleAppender(STInt(8, false), 2)))))
+    n43.I0 := n33.O
+    n43.I1 := n2.O
+    n43.valid_up := n33.valid_down & n2.valid_down
+    val n57 = Module(new MapT(new MapT(new Serialize(3, 0, STInt(8, false)))))
+    n57.I := n43.O
+    n57.valid_up := n43.valid_down
+    val n58 = Module(new Map2T(new Map2T(new SSeqTupleCreator(TSeq(3, 0, STInt(8, false))))))
+    n58.I0 := n30.O
+    n58.I1 := n57.O
+    n58.valid_up := n30.valid_down & n57.valid_down
+    val n65 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n65.I := n1.O
+    n65_shift_I := n1.O
+    n65_shift_O := n65.O
+    n65_valid_down := n65.valid_down
+    n65.valid_up := n1.valid_down
+    val n66 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
+    n66.I := n65.O
+    n66_shift_O := n66.O
+    n66_valid_down := n66.valid_down
+    n66.valid_up := n66.valid_down
+    val n67 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleCreator(STInt(8, false))))))
+    n67.I0 := n66.O
+    n67.I1 := n65.O
+    n67.valid_up := n66.valid_down & n65.valid_down
+    val n77 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleAppender(STInt(8, false), 2)))))
+    n77.I0 := n67.O
+    n77.I1 := n1.O
+    n77.valid_up := n67.valid_down & n1.valid_down
+    val n91 = Module(new MapT(new MapT(new Serialize(3, 0, STInt(8, false)))))
+    n91.I := n77.O
+    ser_91_I := n77.O
+    ser_91_O := n91.O
+    n91.valid_up := n77.valid_down
+    val n92 = Module(new Map2T(new Map2T(new SSeqTupleAppender(TSeq(3, 0, STInt(8, false)), 2))))
+    n92.I0 := n58.O
+    n92.I1 := n91.O
+    n92.valid_up := n58.valid_down & n91.valid_down
+    val n101 = Module(new MapT(new Serialize(3, 0, TSeq(3, 0, STInt(8, false)))))
+    n101.I := n92.O
+    ser_101_I := n92.O
+    ser_101_O := n101.O
+    n101.valid_up := n92.valid_down
+    val n141 = Module(new MapT(new Module_0()))
+    n141.I := n101.O
+    mod_0_in := n101.O
+    n141.valid_up := n101.valid_down
+    val n142 = Module(new Passthrough(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false))))))
+    n142.I := n141.O
+    n142.valid_up := n141.valid_down
+    val n143 = Module(new FIFO(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), 1))
+    n143.I := n142.O
+    n143.valid_up := n142.valid_down
+    val n144 = Module(new FIFO(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), 1))
+    n144.I := n143.O
+    n144.valid_up := n143.valid_down
+    val n145 = Module(new FIFO(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), 1))
+    n145.I := n144.O
+    n145.valid_up := n144.valid_down
+    O := n145.O
+    valid_down := n145.valid_down
+}
+
+
+
+import chisel3.iotesters.ChiselFlatSpec
+
+class TopTest(c: Top) extends NestedPeekPokeTester(c) {
+    val chisel_inputs0 = JsonParser(Source.fromFile("/tmp/ae_input_05505-0.json").getLines.mkString).convertTo[IndexedSeq[Int]]
+    val chisel_inputs0_valid =  JsonParser(Source.fromFile("/tmp/ae_in_valid_05505-1.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
+    val chisel_output =  JsonParser(Source.fromFile("/tmp/ae_output5505-2.json").getLines.mkString).convertTo[IndexedSeq[Int]]
+    val chisel_output_valid =  JsonParser(Source.fromFile("/tmp/ae_out_valid5505-3.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
+    poke_nested(c.valid_up, 1.B)
+    var output_counter = 0
+    val run_clks = 144
+    val pipeline_clks = 16
+    val total_clks = run_clks + pipeline_clks
+    for(f_clk <- 0 to (total_clks - 1)) {
+        println(s"clk: $f_clk")
+        if (f_clk < run_clks  && chisel_inputs0_valid(f_clk)) {
+            poke_nested(c.I, nest_indexed_seq(chisel_inputs0(f_clk),compute_num_atoms_per_sseq_layer(c.I)))
+        }
+        peek_any_module(c)
+        if(f_clk > 16){
+            output_counter += 1
+        }
+        if(f_clk >= 16){
+            expect_nested(c.valid_down, 1)
+        }
+        if(f_clk < 16){
+            expect_nested(c.valid_down, 0)
+        }
+        if(f_clk >= pipeline_clks &&  chisel_output_valid(output_counter)){
+            expect_nested(c.O, nest_indexed_seq(chisel_output(output_counter),compute_num_atoms_per_sseq_layer(c.O)))
+        }
+        step(1)
+    }
+}
+
+class TopTester extends ChiselFlatSpec {
+    "Top" should "behave correctly" in {
+        iotesters.Driver.execute(Array("--backend-name", "verilator","--target-dir","test_run_dir/top"), () => new Top()) {
+        //iotesters.Driver.execute(Array(), () => new Top()) {
+            c => new TopTest(c)
+        } should be(true)
+    }
+}
