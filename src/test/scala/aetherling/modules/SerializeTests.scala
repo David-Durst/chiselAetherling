@@ -20,6 +20,22 @@ class SerializeBasicTester(c: Serialize) extends NestedPeekPokeTester(c) {
   }
 }
 
+class SerializeInvalidTester(c: Serialize) extends NestedPeekPokeTester(c) {
+  poke_nested(c.valid_up, true)
+  for(i <- 0 to 5) {
+    printf(s"clk: $i\n")
+    if (i % 3 == 0)
+      poke_nested(c.I, Array(BigInt(0+i), BigInt(1+i)))
+    else
+      poke_nested(c.I, Array(BigInt(40), BigInt(40)))
+    peek_any_module(c)
+    if (i % 3 != 0) {
+      expect_nested(c.O.asUInt(), i-1)
+    }
+    step(1)
+  }
+}
+
 class SerializeTSeqTester(c: Serialize) extends NestedPeekPokeTester(c) {
   poke_nested(c.valid_up, true)
   for(i <- 0 to 9) {
@@ -42,7 +58,13 @@ class SerializeTester extends ChiselFlatSpec {
     } should be(true)
   }
 
-  "Serialize" should "serialize three TSeq(3,0,IntT) correctly" in {
+  it should "serialize two numbers over three clocks correctly" in {
+    iotesters.Driver.execute(Array(), () => new Serialize(2, 1, new STInt(8))) {
+      c => new SerializeInvalidTester(c)
+    } should be(true)
+  }
+
+  it should "serialize three TSeq(3,0,IntT) correctly" in {
     iotesters.Driver.execute(Array(), () => new Serialize(3, 0, TSeq(3, 0, new STInt(8)))) {
       c => new SerializeTSeqTester(c)
     } should be(true)

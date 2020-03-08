@@ -14,7 +14,7 @@ class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
   val elem_counter = Module(new NestedCountersWithNumValid(elem_t, false))
   //printf(p"elem_counter cur_valid: ${elem_counter.cur_valid}\n")
   elem_counter.CE := valid_up
-  val (bank_counter_value, _) = Counter(valid_up && elem_counter.last, n)
+  val (bank_counter_value, _) = Counter(valid_up && elem_counter.last, n + i)
   //printf(p"bank_counter_value: ${bank_counter_value}\n")
 
   val mux_input_wire = Wire(Vec(n, elem_t.chiselRepr()))
@@ -37,10 +37,9 @@ class Serialize(n: Int, i: Int, elem_t: STTypeDefinition) extends MultiIOModule
     }
     else {
       val regs = for (_ <- 0 to n-2) yield Reg(elem_t.chiselRepr())
-      val (read_bank_counter_value, _) = Counter(valid_up, n)
 
       for (j <- 0 to n-2) {
-        when (read_bank_counter_value === 0.U && valid_up) { regs(j) := I.asInstanceOf[Vec[Data]](j+1)}
+        when (bank_counter_value === 0.U && valid_up) { regs(j) := I.asInstanceOf[Vec[Data]](j+1)}
         mux_input_wire(j+1) := regs(j)
       }
     }
