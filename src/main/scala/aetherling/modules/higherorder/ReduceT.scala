@@ -18,8 +18,12 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     valid_down := RegNext(valid_up, false.B)
   }
   else {
+    // only increment when on a valid element
+    val per_elem_counter = Module(new NestedCountersWithNumValid(elem_t, false))
+    //printf(p"per_elem_counter valid: ${per_elem_counter.valid}\n")
+
     val op_inst = Module(op)
-    val (elem_counter_value, _) = Counter(valid_up, n + i)
+    val (elem_counter_value, _) = Counter(valid_up && per_elem_counter.last, n + i)
 
     // wire output of op and module input to mux into accum reg
     // wire module input and output of accum reg to op
@@ -29,7 +33,13 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     //  (excluding clock 0, but not outputing on that clock as n==1 case handled separately)
     val op_output_or_module_input = Mux(elem_counter_value === 0.U, I, op_inst.O)
     val accum_reg = Reg(elem_t.chiselRepr())
-    when (valid_up) { accum_reg := op_output_or_module_input }
+
+    per_elem_counter.CE := valid_up
+    when (per_elem_counter.valid) { accum_reg := op_output_or_module_input }
+    //printf(p"accum_reg: ${accum_reg}\n")
+    //printf(p"op_output: ${op_inst.O}\n")
+    //printf(p"elem_counter_value: ${elem_counter_value}\n")
+
     Helpers.getFstTuple(Helpers.stripVec1(op_inst.I)) := Helpers.stripVec1(I)
     Helpers.getSndTuple(Helpers.stripVec1(op_inst.I)) := Helpers.stripVec1(accum_reg)
     undelayed_out := op_inst.O

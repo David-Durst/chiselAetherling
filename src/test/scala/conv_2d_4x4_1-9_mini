@@ -1,22 +1,18 @@
-package aetherling.modules
-import aetherling.modules.helpers._
-import aetherling.modules.shift._
-import aetherling.modules.higherorder._
-import aetherling.types._
 import aetherling.modules.helpers.GlobalValues.undef
+import aetherling.modules.helpers._
+import aetherling.modules.higherorder._
+import aetherling.modules.shift._
+import aetherling.types._
 import chisel3._
-import scala.io.Source
+import spray.json.DefaultJsonProtocol._
 import spray.json._
-import DefaultJsonProtocol._
+
+import scala.io.Source
 
 
 class Module_0() extends MultiIOModule  with UnaryInterface with ValidInterface {
     val I = IO(Input(TSeq(3, 0, TSeq(3, 0, STInt(8, false))).chiselRepr()))
     val O = IO(Output(TSeq(1, 2, TSeq(1, 2, STInt(8, false))).chiselRepr()))
-    val red_1_in = IO(Output(STInt(8, false).chiselRepr()))
-    val red_1_out = IO(Output(STInt(8, false).chiselRepr()))
-    val red_1_valid_in = IO(Output(STBit().chiselRepr()))
-    val red_1_valid_out = IO(Output(STBit().chiselRepr()))
     val (const146_O, const146_valid_down) = Const(TSeq(3, 0, TSeq(3, 0, STInt(8, false))), Const.make_vec(0.U(8.W),1.U(8.W),0.U(8.W),1.U(8.W),2.U(8.W),1.U(8.W),0.U(8.W),1.U(8.W),0.U(8.W)), 3, valid_up)
     val n105 = Module(new Map2T(new Map2T(new AtomTuple(STInt(8, false), STInt(8, false)))))
     n105.I0 := I
@@ -30,10 +26,6 @@ class Module_0() extends MultiIOModule  with UnaryInterface with ValidInterface 
     n121.valid_up := n116.valid_down
     val n126 = Module(new ReduceT(3, 0, new MapTNoValid(new AddNoValid(STInt(8, false))), TSeq(1, 2, STInt(8, false))))
     n126.I := n121.O
-    red_1_in := n121.O
-    red_1_out := n126.O
-    red_1_valid_in := n121.valid_down
-    red_1_valid_out := n126.valid_down
     n126.valid_up := n121.valid_down
     val (const147_O, const147_valid_down) = Const(TSeq(1, 2, TSeq(1, 2, STInt(8, false))), Const.make_vec(4.U(8.W),undef,undef,undef,undef,undef,undef,undef,undef), 13, valid_up)
     val n129 = Module(new Map2T(new Map2T(new AtomTuple(STInt(8, false), STInt(8, false)))))
@@ -50,35 +42,25 @@ class Module_0() extends MultiIOModule  with UnaryInterface with ValidInterface 
 class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
     val I = IO(Input(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))).chiselRepr()))
     val O = IO(Output(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))).chiselRepr()))
-    //val n2_shift_I = IO(Output(STInt(8, false).chiselRepr()))
-    //val n2_shift_O = IO(Output(STInt(8, false).chiselRepr()))
-    //val n65_shift_I = IO(Output(STInt(8, false).chiselRepr()))
-    //val n65_shift_O = IO(Output(STInt(8, false).chiselRepr()))
-    //val n65_valid_down = IO(Output(STBit().chiselRepr()))
-    //val n66_shift_O = IO(Output(STInt(8, false).chiselRepr()))
-    //val n66_valid_down = IO(Output(STBit().chiselRepr()))
-    /*
-    val ser_91_valid_up = IO(Output(STBit().chiselRepr()))
+    val n2_shift_I = IO(Output(STInt(8, false).chiselRepr()))
+    val n2_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_shift_I = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n65_valid_down = IO(Output(STBit().chiselRepr()))
+    val n66_shift_O = IO(Output(STInt(8, false).chiselRepr()))
+    val n66_valid_down = IO(Output(STBit().chiselRepr()))
     val ser_91_I = IO(Output(SSeq(3, STInt(8, false)).chiselRepr()))
     val ser_91_O = IO(Output(STInt(8, false).chiselRepr()))
     val ser_101_I = IO(Output(SSeq(3, STInt(8, false)).chiselRepr()))
     val ser_101_O = IO(Output(STInt(8, false).chiselRepr()))
-     */
     val mod_0_in = IO(Output(STInt(8, false).chiselRepr()))
-    val mod_0_out = IO(Output(STInt(8, false).chiselRepr()))
-    val mod_0_valid_in = IO(Output(STBit().chiselRepr()))
-    val mod_0_valid_out = IO(Output(STBit().chiselRepr()))
-    val red_1_in = IO(Output(STInt(8, false).chiselRepr()))
-    val red_1_out = IO(Output(STInt(8, false).chiselRepr()))
-    val red_1_valid_in = IO(Output(STBit().chiselRepr()))
-    val red_1_valid_out = IO(Output(STBit().chiselRepr()))
     val n1 = Module(new FIFO(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), 1))
     n1.I := I
     n1.valid_up := valid_up
     val n2 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 4, STInt(8, false)))
     n2.I := n1.O
-    //n2_shift_I := n1.O
-    //n2_shift_O := n2.O
+    n2_shift_I := n1.O
+    n2_shift_O := n2.O
     n2.valid_up := n1.valid_down
     val n3 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 4, STInt(8, false)))
     n3.I := n2.O
@@ -123,15 +105,15 @@ class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
     n58.valid_up := n30.valid_down & n57.valid_down
     val n65 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
     n65.I := n1.O
-    //n65_shift_I := n1.O
-    //n65_shift_O := n65.O
-    //n65_valid_down := n65.valid_down
+    n65_shift_I := n1.O
+    n65_shift_O := n65.O
+    n65_valid_down := n65.valid_down
     n65.valid_up := n1.valid_down
     val n66 = Module(new ShiftTN(16, Array(1,1), 0, Array(2,2), 1, STInt(8, false)))
     n66.I := n65.O
-    //n66_shift_O := n66.O
-    //n66_valid_down := n66.valid_down
-    n66.valid_up := n65.valid_down
+    n66_shift_O := n66.O
+    n66_valid_down := n66.valid_down
+    n66.valid_up := n66.valid_down
     val n67 = Module(new Map2T(new Map2T(new Map2T(new SSeqTupleCreator(STInt(8, false))))))
     n67.I0 := n66.O
     n67.I1 := n65.O
@@ -142,9 +124,8 @@ class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
     n77.valid_up := n67.valid_down & n1.valid_down
     val n91 = Module(new MapT(new MapT(new Serialize(3, 0, STInt(8, false)))))
     n91.I := n77.O
-    //ser_91_valid_up := n77.valid_down
-    //ser_91_I := n77.O
-    //ser_91_O := n91.O
+    ser_91_I := n77.O
+    ser_91_O := n91.O
     n91.valid_up := n77.valid_down
     val n92 = Module(new Map2T(new Map2T(new SSeqTupleAppender(TSeq(3, 0, STInt(8, false)), 2))))
     n92.I0 := n58.O
@@ -152,19 +133,12 @@ class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
     n92.valid_up := n58.valid_down & n91.valid_down
     val n101 = Module(new MapT(new Serialize(3, 0, TSeq(3, 0, STInt(8, false)))))
     n101.I := n92.O
-    //ser_101_I := n92.O
-    //ser_101_O := n101.O
+    ser_101_I := n92.O
+    ser_101_O := n101.O
     n101.valid_up := n92.valid_down
-    val n141 = Module(new Module_0())
+    val n141 = Module(new MapT(new Module_0()))
     n141.I := n101.O
     mod_0_in := n101.O
-    mod_0_out := n141.O
-    mod_0_valid_in := n101.valid_down
-    mod_0_valid_out := n141.valid_down
-    red_1_in := n141.red_1_in
-    red_1_out := n141.red_1_out
-    red_1_valid_in := n141.red_1_valid_in
-    red_1_valid_out := n141.red_1_valid_out
     n141.valid_up := n101.valid_down
     val n142 = Module(new Passthrough(TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false)))), TSeq(16, 0, TSeq(1, 2, TSeq(1, 2, STInt(8, false))))))
     n142.I := n141.O
@@ -184,14 +158,13 @@ class Top() extends MultiIOModule  with UnaryInterface with ValidInterface {
 
 
 
-import aetherling.modules._
 import chisel3.iotesters.ChiselFlatSpec
 
 class TopTest(c: Top) extends NestedPeekPokeTester(c) {
-    val chisel_inputs0 = JsonParser(Source.fromFile("/tmp/ae_input_011342-0.json").getLines.mkString).convertTo[IndexedSeq[Int]]
-    val chisel_inputs0_valid =  JsonParser(Source.fromFile("/tmp/ae_in_valid_011342-1.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
-    val chisel_output =  JsonParser(Source.fromFile("/tmp/ae_output11342-2.json").getLines.mkString).convertTo[IndexedSeq[Int]]
-    val chisel_output_valid =  JsonParser(Source.fromFile("/tmp/ae_out_valid11342-3.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
+    val chisel_inputs0 = JsonParser(Source.fromFile("/tmp/ae_input_05505-0.json").getLines.mkString).convertTo[IndexedSeq[Int]]
+    val chisel_inputs0_valid =  JsonParser(Source.fromFile("/tmp/ae_in_valid_05505-1.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
+    val chisel_output =  JsonParser(Source.fromFile("/tmp/ae_output5505-2.json").getLines.mkString).convertTo[IndexedSeq[Int]]
+    val chisel_output_valid =  JsonParser(Source.fromFile("/tmp/ae_out_valid5505-3.json").getLines.mkString).convertTo[IndexedSeq[Boolean]]
     poke_nested(c.valid_up, 1.B)
     var output_counter = 0
     val run_clks = 144

@@ -53,7 +53,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     signal match {
       case s: TupleBundle => poke_nested(s, values)
       case s: Aggregate => poke_nested(s, values)
-      case s => throw new Exception(s"Can't expect a nested set of values for a type $s")
+      case s => throw new Exception(s"Can't poke a nested set of values for a type $s")
     }
   }
 
