@@ -1,6 +1,7 @@
 package aetherling.types
 
 import chisel3._
+import chisel3.experimental.FixedPoint
 
 abstract class STTypeDefinition {
   /**
@@ -192,6 +193,38 @@ case class STInt(width: Int, signed: Boolean = false) extends STTypeDefinition w
     else {
       UInt(width.W)
     }
+  }
+}
+
+case class STFixP1_7() extends STTypeDefinition {
+  /**
+    * Total amount of atoms over the entire time of the ST type
+    */
+  override def length(): Int = 1
+
+  /**
+    * Number of atoms each active clock
+    */
+  override def portWidth(): Int = 1
+
+  /**
+    * Number of clocks required for an operator to accept or emit this type
+    */
+  override def time(): Int = 1
+
+  /**
+    * Number of valid clocks in .time() clocks
+    *
+    * @return
+    */
+  override def validClocks(): Int = 1
+
+  /**
+    * A Chisel representation of this type as a nested array of bits.
+    * Chisel doesn't acount for time.
+    */
+  override def chiselRepr(): Data = {
+    FixedPoint(8.W, 7.BP)
   }
 }
 

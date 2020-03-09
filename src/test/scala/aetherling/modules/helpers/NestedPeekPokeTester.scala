@@ -2,7 +2,7 @@ package aetherling.modules.helpers
 
 import Chisel.SInt
 import aetherling.types.TupleBundle
-import chisel3.experimental.DataMirror
+import chisel3.experimental.{DataMirror, FixedPoint}
 import chisel3.iotesters.PeekPokeTester
 import chisel3.{Aggregate, Bool, Data, MultiIOModule, UInt}
 
@@ -215,6 +215,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       case s: Aggregate => s"Vec(${s.getElements.map(peek_str).reduce((l,r) => l + ", " + r)})"
       case s: UInt => peek(s).toString
       case s: SInt => peek(s).toString
+      case s: FixedPoint => peek(s).toString
       case s => s"Cannot peek_str $s which has class ${s.getClass}"
     }
   }
