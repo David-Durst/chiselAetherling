@@ -233,7 +233,6 @@ class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
     inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 8) {
-    Module(new BlackBoxMulInt8)
     val inner_mul = Module(new BlackBoxMulInt8)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
@@ -241,30 +240,28 @@ class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
     inner_mul.io.clock := clock
   }
   else if (!t.signed && t.width == 16) {
-    val inner_mul = Module(new BlackBoxMulUInt8)
+    val inner_mul = Module(new BlackBoxMulUInt16)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O(15,0)
     inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 16) {
-    Module(new BlackBoxMulInt8)
-    val inner_mul = Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt16)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O(15,0)
     inner_mul.io.clock := clock
   }
   else if (!t.signed && t.width == 32) {
-    val inner_mul = Module(new BlackBoxMulUInt8)
+    val inner_mul = Module(new BlackBoxMulUInt32)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O(31,0)
     inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 32) {
-    Module(new BlackBoxMulInt8)
-    val inner_mul = Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt32)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O(31,0)
@@ -349,14 +346,14 @@ class Div(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
     inner_mul.io.clock := clock
   }
   else if (!t.signed && t.width == 16) {
-    val inner_mul = Module(new BlackBoxMulUInt8)
+    val inner_mul = Module(new BlackBoxMulUInt16)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := Cat(0.U, I.t1b.asUInt())
     O := inner_mul.io.O(22,7)
     inner_mul.io.clock := clock
   }
   else if (!t.signed && t.width == 32) {
-    val inner_mul = Module(new BlackBoxMulUInt8)
+    val inner_mul = Module(new BlackBoxMulUInt32)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := Cat(0.U, I.t1b.asUInt())
     O := inner_mul.io.O(38,7)
