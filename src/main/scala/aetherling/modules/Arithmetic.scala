@@ -3,7 +3,7 @@ package aetherling.modules
 import aetherling.modules.helpers._
 import aetherling.types._
 import chisel3._
-import chisel3.util.HasBlackBoxResource
+import chisel3.util.{Cat, HasBlackBoxResource}
 import chisel3.experimental.DataMirror
 
 import scala.io.Source
@@ -165,7 +165,7 @@ class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
     val inner_mul = Module(new BlackBoxMulUInt8)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
-    O := inner_mul.io.O
+    O := inner_mul.io.O(7,0)
     inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 8) {
@@ -173,13 +173,49 @@ class Mul(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterfac
     val inner_mul = Module(new BlackBoxMulInt8)
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
-    O := inner_mul.io.O
+    O := inner_mul.io.O(7,0)
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 16) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(15,0)
+    inner_mul.io.clock := clock
+  }
+  else if (t.signed && t.width == 16) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(15,0)
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 32) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(31,0)
+    inner_mul.io.clock := clock
+  }
+  else if (t.signed && t.width == 32) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(31,0)
+    inner_mul.io.clock := clock
   }
   else {
     ???
   }
 
-  valid_down := RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B)
+  if (t.width == 32) {
+    valid_down := RegNext(RegNext(RegNext(RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B))))
+  }
+  else {
+    valid_down := RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B)
+  }
 }
 
 /**
@@ -194,6 +230,7 @@ class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O
+    inner_mul.io.clock := clock
   }
   else if (t.signed && t.width == 8) {
     Module(new BlackBoxMulInt8)
@@ -201,6 +238,37 @@ class MulNoValid(t: STInt) extends MultiIOModule with UnaryInterface {
     inner_mul.io.I0 := I.t0b
     inner_mul.io.I1 := I.t1b
     O := inner_mul.io.O
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 16) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(15,0)
+    inner_mul.io.clock := clock
+  }
+  else if (t.signed && t.width == 16) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(15,0)
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 32) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(31,0)
+    inner_mul.io.clock := clock
+  }
+  else if (t.signed && t.width == 32) {
+    Module(new BlackBoxMulInt8)
+    val inner_mul = Module(new BlackBoxMulInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := I.t1b
+    O := inner_mul.io.O(31,0)
+    inner_mul.io.clock := clock
   }
   else {
     ???
@@ -211,7 +279,7 @@ class BlackBoxMulUInt8 extends BlackBox with HasBlackBoxResource {
   val io = IO(new Bundle() {
     val I0 = Input(UInt(8.W))
     val I1 = Input(UInt(8.W))
-    val O = Output(UInt(8.W))
+    val O = Output(UInt(16.W))
     val clock = Input(Clock())
   })
   addResource("/verilogAetherling/mul.v")
@@ -221,7 +289,48 @@ class BlackBoxMulInt8 extends BlackBox with HasBlackBoxResource {
   val io = IO(new Bundle() {
     val I0 = Input(SInt(8.W))
     val I1 = Input(SInt(8.W))
-    val O = Output(SInt(8.W))
+    val O = Output(SInt(16.W))
+    val clock = Input(Clock())
+  })
+  addResource("verilogAetherling/mul.v")
+}
+
+class BlackBoxMulUInt16 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(UInt(16.W))
+    val I1 = Input(UInt(16.W))
+    val O = Output(UInt(32.W))
+    val clock = Input(Clock())
+  })
+  addResource("/verilogAetherling/mul.v")
+}
+
+class BlackBoxMulInt16 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(SInt(16.W))
+    val I1 = Input(SInt(16.W))
+    val O = Output(SInt(32.W))
+    val clock = Input(Clock())
+  })
+  addResource("verilogAetherling/mul.v")
+}
+
+class BlackBoxMulUInt32 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(UInt(32.W))
+    val I1 = Input(UInt(32.W))
+    val O = Output(UInt(64.W))
+    val clock = Input(Clock())
+  })
+  addResource("/verilogAetherling/mul.v")
+}
+
+class BlackBoxMulInt32 extends BlackBox with HasBlackBoxResource {
+  val io = IO(new Bundle() {
+    val I0 = Input(SInt(32.W))
+    val I1 = Input(SInt(32.W))
+    val O = Output(SInt(64.W))
+    val clock = Input(Clock())
   })
   addResource("verilogAetherling/mul.v")
 }
@@ -230,15 +339,39 @@ class BlackBoxMulInt8 extends BlackBox with HasBlackBoxResource {
   * @param t the Space-Time Int type (specifies width)
   */
 class Div(t: STInt) extends MultiIOModule with UnaryInterface with ValidInterface {
-  override val I = IO(Input(STAtomTuple(t,t).chiselRepr()))
+  override val I = IO(Input(STAtomTuple(t,STFixP1_7()).chiselRepr()))
   override val O = IO(Output(t.chiselRepr()))
-  if (t.signed) {
-    O := I.t0b.asInstanceOf[SInt] / I.t1b.asInstanceOf[SInt]
+  if (!t.signed && t.width == 8) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := Cat(0.U, I.t1b.asUInt())
+    O := inner_mul.io.O(14,7)
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 16) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := Cat(0.U, I.t1b.asUInt())
+    O := inner_mul.io.O(22,7)
+    inner_mul.io.clock := clock
+  }
+  else if (!t.signed && t.width == 32) {
+    val inner_mul = Module(new BlackBoxMulUInt8)
+    inner_mul.io.I0 := I.t0b
+    inner_mul.io.I1 := Cat(0.U, I.t1b.asUInt())
+    O := inner_mul.io.O(38,7)
+    inner_mul.io.clock := clock
   }
   else {
-    O := I.t0b.asUInt() / I.t1b.asUInt()
+    ???
   }
-  valid_down := RegNext(valid_up, false.B)
+
+  if (t.width == 32) {
+    valid_down := RegNext(RegNext(RegNext(RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B))))
+  }
+  else {
+    valid_down := RegNext(RegNext(RegNext(valid_up, false.B), false.B), false.B)
+  }
 }
 
 /**
