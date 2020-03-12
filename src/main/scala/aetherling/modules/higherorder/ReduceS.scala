@@ -14,7 +14,7 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
   override val O = IO(Output(Vec(1, elem_t.chiselRepr())))
 
   if (n == 1) {
-    O := RegNext(I)
+    O := RegNext(RegNext(I))
   }
   else {
     val ops = (0 to (n-2)).map(_ => Module(op))
@@ -40,9 +40,9 @@ class ReduceS(n: Int, op: => MultiIOModule with UnaryInterface, elem_t: STTypeDe
 
     // wire inputs to tree
     for ((unwired_in, i) <- unwired_ins.view.zipWithIndex) {
-      unwired_in := Helpers.stripVec1(I(i))
+      unwired_in := Helpers.stripVec1(RegNext(I(i)))
     }
   }
 
-  valid_down := RegNext(valid_up, false.B)
+  valid_down := RegNext(RegNext(valid_up, false.B))
 }

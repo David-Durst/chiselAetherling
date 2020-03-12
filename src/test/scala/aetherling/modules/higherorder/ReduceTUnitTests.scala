@@ -9,7 +9,7 @@ import chisel3.{iotesters, _}
 class ReduceTAddUnitTester(c: ReduceT) extends NestedPeekPokeTester(c) {
   poke(c.valid_up, true.B)
   var f_clk = 0
-  for(i <- -2 to 3 by 1) {
+  for(i <- -2 to 4 by 1) {
     println(s"clk: $f_clk")
 
     poke(c.I.asInstanceOf[SInt], BigInt(i))
@@ -20,7 +20,7 @@ class ReduceTAddUnitTester(c: ReduceT) extends NestedPeekPokeTester(c) {
     }
     peek_any_module(c)
     step(1)
-    if (i == 3) {
+    if (i == 4) {
       expect(c.valid_down.asInstanceOf[Bool], true.B)
     }
     f_clk += 1
