@@ -26,10 +26,10 @@ class RAM_ST(t: STTypeDefinition, n: Int) extends MultiIOModule {
   println(s"Made a memory of size ${t.validClocks()*n} with elements of type ${t.chiselRepr()}")
   val waddr_offsets_rom = VecInit(for (i <- 0 to n-1) yield (i * t.validClocks()).U)
   val raddr_offsets_rom = VecInit(for (i <- 0 to n-1) yield (i * t.validClocks()).U)
-  val ram = SyncReadMem(t.validClocks()*n, t.chiselRepr())
+  val ram = SyncReadMem(t.validClocks()*n, t.flatChiselRepr())
 
-  when(write_elem_counter.valid) { ram.write(waddr_offsets_rom(WADDR) + write_elem_counter.cur_valid, WDATA) }
-  RDATA := ram.read(raddr_offsets_rom(RADDR) + read_elem_counter.cur_valid, read_elem_counter.valid)
+  when(write_elem_counter.valid) { ram.write(waddr_offsets_rom(WADDR) + write_elem_counter.cur_valid, WDATA.asUInt()) }
+  RDATA := ram.read(raddr_offsets_rom(RADDR) + read_elem_counter.cur_valid, read_elem_counter.valid).asTypeOf(RDATA)
 
   def getRAMAddrWidth(n: Int) = max((n-1).U.getWidth, 1).W
 }

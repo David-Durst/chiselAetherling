@@ -30,9 +30,6 @@ class ShiftTS(no: Int, io: Int, ni: Int, shift_amount: Int, elem_t: STTypeDefini
     .map{case (shift_amount, shift_amount_xs) => (shift_amount, shift_amount_xs.size)}
   val shifts = shift_amounts_count.map{case (shift_amount, num_shifted) =>
     (shift_amount, Module(new ShiftT(no, io, shift_amount, SSeq(num_shifted, elem_t))))}
-  //  .toSet.map({shift_amount => if (shift_amount == 0) null else Module(new ShiftT(no, io, shift_amount, elem_t)) })
-  //println(s"For ShiftTS ${ShiftTS.num_shift_ts_made} the shift_amounts are ${shift_amounts}")
-  //ShiftTS.num_shift_ts_made += 1
   val cur_lanes_for_shift_amounts = scala.collection.mutable.Map(
     shift_amounts_count.map{case (shift_amount, _) => (shift_amount, 0)}.toSeq : _*
   )
@@ -43,7 +40,6 @@ class ShiftTS(no: Int, io: Int, ni: Int, shift_amount: Int, elem_t: STTypeDefini
       O.asInstanceOf[Vec[Data]](i) := I.asInstanceOf[Vec[Data]](floorMod(i - shift_amount, ni))
     }
     else {
-      //val shift_one_lane = Module(new ShiftT(no, io, shift_amount_t, elem_t))
       val cur_shifts = shifts.get(shift_amount_t).get
       val cur_shift_lane = cur_lanes_for_shift_amounts.getOrElse(shift_amount_t, 0)
       val shift_one_lane_in = cur_shifts.I.asInstanceOf[Vec[Data]]

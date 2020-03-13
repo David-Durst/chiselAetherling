@@ -15,6 +15,11 @@ abstract class STTypeDefinition {
   def portWidth(): Int
 
   /**
+    * Number of bits in the port
+    */
+  def portBits(): Int
+
+  /**
     * Number of clocks required for an operator to accept or emit this type
     */
   def time(): Int
@@ -27,10 +32,19 @@ abstract class STTypeDefinition {
 
   /**
     * A Chisel representation of this type as a nested array of bits.
-        Chisel doesn't acount for time.
+    *   Chisel doesn't acount for time.
     */
   def chiselRepr(): Data
+
+  /**
+    * A Chisel representation of this type as a flat UInt.
+    * This avoid's chisel duplication logic for Vec's
+    */
+  def flatChiselRepr(): Data = {
+    UInt(portBits().W)
+  }
 }
+
 
 trait NestedSTType[T <: STTypeDefinition] extends STTypeDefinition {
   val n: Int
@@ -47,7 +61,12 @@ case class TSeq[T <: STTypeDefinition](n: Int, i: Int, t: T) extends STTypeDefin
   /**
     * Number of atoms each active clock
     */
-  override def portWidth(): Int = t.length()
+  override def portWidth(): Int = t.portWidth()
+
+  /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = t.portBits()
 
   /**
     * Number of clocks required for an operator to accept or emit this type
@@ -77,7 +96,12 @@ case class SSeq[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinition wi
   /**
     * Number of atoms each active clock
     */
-  override def portWidth(): Int = n * t.length()
+  override def portWidth(): Int = n * t.portWidth()
+
+  /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = n * t.portBits()
 
   /**
     * Number of clocks required for an operator to accept or emit this type
@@ -107,7 +131,12 @@ case class SSeq_Tuple[T <: STTypeDefinition](n: Int, t: T) extends STTypeDefinit
   /**
     * Number of atoms each active clock
     */
-  override def portWidth(): Int = n * t.length()
+  override def portWidth(): Int = n * t.portWidth()
+
+  /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = n * t.portBits()
 
   /**
     * Number of clocks required for an operator to accept or emit this type
@@ -141,6 +170,11 @@ case class STAtomTuple[T0 <: STTypeDefinition, T1 <: STTypeDefinition](t0: T0, t
   override def portWidth(): Int = t0.portWidth() + t1.portWidth()
 
   /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = t0.portBits() + t1.portBits()
+
+  /**
     * Number of clocks required for an operator to accept or emit this type
     */
   override def time(): Int = 1
@@ -169,6 +203,11 @@ case class STInt(width: Int, signed: Boolean = false) extends STTypeDefinition w
     * Number of atoms each active clock
     */
   override def portWidth(): Int = 1
+
+  /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = width
 
   /**
     * Number of clocks required for an operator to accept or emit this type
@@ -208,6 +247,11 @@ case class STFixP1_7() extends STTypeDefinition {
   override def portWidth(): Int = 1
 
   /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = 8
+
+  /**
     * Number of clocks required for an operator to accept or emit this type
     */
   override def time(): Int = 1
@@ -238,6 +282,11 @@ case class STBit() extends STTypeDefinition with STIntOrBit {
     * Number of atoms each active clock
     */
   override def portWidth(): Int = 1
+
+  /**
+    * Number of bits in the port
+    */
+  def portBits(): Int = 1
 
   /**
     * Number of clocks required for an operator to accept or emit this type
