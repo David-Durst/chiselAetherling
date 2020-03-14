@@ -14,7 +14,7 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
 
   val undelayed_out = Wire(elem_t.chiselRepr())
   if (n == 1) {
-    undelayed_out := I
+    undelayed_out := RegNext(I)
     valid_down := RegNext(RegNext(valid_up, false.B), false.B)
   }
   else {
@@ -23,7 +23,7 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     //printf(p"per_elem_counter valid: ${per_elem_counter.valid}\n")
 
     val op_inst = Module(op)
-    val (elem_counter_value, _) = Counter(valid_up && per_elem_counter.last, n + i)
+    val (elem_counter_value, _) = Counter(RegNext(valid_up, false.B) && per_elem_counter.last, n + i)
 
     // wire output of op and module input to mux into accum reg
     // wire module input and output of accum reg to op
@@ -49,7 +49,7 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     // once valid always valid, following the aetherling valid interface
     val valid_reg = RegInit(Bool(), false.B)
     valid_reg := valid_reg || (elem_counter_value === (n-1).U)
-    valid_down := RegNext(valid_reg, false.B)
+    valid_down := valid_reg
   }
 
   O := RegNext(undelayed_out)
