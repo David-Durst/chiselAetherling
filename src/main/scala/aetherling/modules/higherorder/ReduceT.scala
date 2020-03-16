@@ -34,10 +34,11 @@ class ReduceT(n: Int, i: Int, op: => MultiIOModule with UnaryInterface, elem_t: 
     val op_output_or_module_input = Mux(elem_counter_value === 0.U, RegNext(I), op_inst.O)
     val accum_reg = Reg(elem_t.chiselRepr())
 
-    per_elem_counter.CE := valid_up
+    per_elem_counter.CE := RegNext(valid_up)
     when (per_elem_counter.valid) { accum_reg := op_output_or_module_input }
     //printf(p"accum_reg: ${accum_reg}\n")
     //printf(p"op_output: ${op_inst.O}\n")
+    //printf(p"op_output_or_module_input: ${op_output_or_module_input}\n")
     //printf(p"elem_counter_value: ${elem_counter_value}\n")
 
     Helpers.getFstTuple(Helpers.stripVec1(op_inst.I)) := Helpers.stripVec1(RegNext(I))
