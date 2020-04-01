@@ -181,6 +181,23 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       }
     }
   }
+  def expect_nested(signal: Data, value: Tuple2[Int, Tuple2[Int,Int]]): Unit = {
+    if (value != int_to_ignore) {
+      if (signal.isInstanceOf[TupleBundle] && signal.asInstanceOf[TupleBundle].t0b.isInstanceOf[SInt]) {
+        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], BigInt(value._1))
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], BigInt(value._2._1))
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[SInt], BigInt(value._2._2))
+      }
+      else if (signal.isInstanceOf[TupleBundle]) {
+        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], BigInt(value._1))
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], BigInt(value._2._1))
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[UInt], BigInt(value._2._2))
+      }
+      else {
+        expect_nested(signal.asInstanceOf[Aggregate].getElements(0), value)
+      }
+    }
+  }
 
   def peek_binary_module(t: MultiIOModule with BinaryInterface with ValidInterface): Unit = {
     println(s"in0: ${peek_str(t.I0)}")
@@ -244,6 +261,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
 
   def nest_indexed_seq(values: Int, nesting_per_layer: IndexedSeq[Int]) = values
   def nest_indexed_seq(values: Boolean, nesting_per_layer: IndexedSeq[Int]) = values
+  def nest_indexed_seq(values: Tuple2[Int,Tuple2[Int,Int]], nesting_per_layer: IndexedSeq[Int]) = values
 
 
   /**

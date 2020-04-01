@@ -36,7 +36,7 @@ class FIFO(t: STTypeDefinition, delay: Int) extends MultiIOModule with UnaryInte
       fifoBuffer.write(writeCounter.value, I)
 
       when(internalDelayCounter.value < delay.U) {
-        printf("idc inc\n")
+        //printf("idc inc\n")
         internalDelayCounter.inc()
       }
       when(internalDelayCounter.value >= (delay - 1).U) {
