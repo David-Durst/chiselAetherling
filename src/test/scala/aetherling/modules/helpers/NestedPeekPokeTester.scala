@@ -129,7 +129,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
           }
         case v: Int => expect_nested(elem, v)
         case v: BigInt => expect_nested(elem, v)
-        case v: Tuple2[Int, Tuple2[Int, Int]] => expect_nested(elem, v)
+        case v: Tuple2[BigInt, Tuple2[BigInt, BigInt]] => expect_nested(elem, v)
         case _ => throw new Exception(s"Cannot expect value ${elem.getClass.getName}")
       }
     }
@@ -183,19 +183,19 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       }
     }
   }
-  def expect_nested(signal: Data, value: Tuple2[Int, Tuple2[Int,Int]]): Unit = {
+  def expect_nested(signal: Data, value: Tuple2[BigInt, Tuple2[BigInt, BigInt]]): Unit = {
     if (signal.isInstanceOf[TupleBundle] && signal.asInstanceOf[TupleBundle].t0b.isInstanceOf[SInt]) {
       if (value._1 != int_to_ignore) {
-        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], BigInt(value._1))
-        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], BigInt(value._2._1))
-        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[SInt], BigInt(value._2._2))
+        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], value._1)
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[SInt], value._2._1)
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[SInt], value._2._2)
       }
     }
     else if (signal.isInstanceOf[TupleBundle]) {
       if (value._1 != int_to_ignore) {
-        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], BigInt(value._1))
-        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], BigInt(value._2._1))
-        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[UInt], BigInt(value._2._2))
+        expect(signal.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], value._1)
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t0b.asInstanceOf[UInt], value._2._1)
+        expect(signal.asInstanceOf[TupleBundle].t1b.asInstanceOf[TupleBundle].t1b.asInstanceOf[UInt], value._2._2)
       }
     }
     else {
@@ -263,9 +263,10 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     }
   }
 
+  def nest_indexed_seq(values: BigInt, nesting_per_layer: IndexedSeq[Int]) = values
   def nest_indexed_seq(values: Int, nesting_per_layer: IndexedSeq[Int]) = values
   def nest_indexed_seq(values: Boolean, nesting_per_layer: IndexedSeq[Int]) = values
-  def nest_indexed_seq(values: Tuple2[Int,Tuple2[Int,Int]], nesting_per_layer: IndexedSeq[Int]) = values
+  def nest_indexed_seq(values: Tuple2[BigInt,Tuple2[BigInt,BigInt]], nesting_per_layer: IndexedSeq[Int]) = values
 
 
   /**
