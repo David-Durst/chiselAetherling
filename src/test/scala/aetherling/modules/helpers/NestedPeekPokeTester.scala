@@ -129,6 +129,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
           }
         case v: Int => expect_nested(elem, v)
         case v: BigInt => expect_nested(elem, v)
+        case v: Tuple2[Int, Tuple2[Int, Int]] => expect_nested(elem, v)
         case _ => throw new Exception(s"Cannot expect value ${elem.getClass.getName}")
       }
     }
@@ -155,7 +156,8 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
       }
     }
   }
-  def expect_nested(signal: Data, value: Int): Unit = {
+  def expect_nested(signal: Data, value: Int): Unit =
+  {
     if (value != int_to_ignore) {
       if (signal.isInstanceOf[SInt]) {
         expect(signal.asInstanceOf[SInt], BigInt(value))
@@ -272,6 +274,7 @@ abstract class NestedPeekPokeTester[+T <: MultiIOModule](val c: T ) extends Peek
     */
   def compute_num_atoms_per_sseq_layer(signal: Data): IndexedSeq[Int] = {
     signal match {
+      case s: TupleBundle => Array[Int]()
       case s: Aggregate =>  {
         val signal_elements = s.getElements
         val lower_layer_elements =
