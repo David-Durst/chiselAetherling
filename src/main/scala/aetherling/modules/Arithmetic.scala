@@ -488,10 +488,10 @@ class Eq(t: STIntOrBit) extends MultiIOModule with UnaryInterface with ValidInte
   override val O = IO(Output(t.chiselRepr()))
   // Ok to cast to UInt as Bool will convert to length 1 vector
   if (t.isInstanceOf[STInt] && t.asInstanceOf[STInt].signed) {
-    O := I.t0b.asInstanceOf[SInt] < I.t1b.asInstanceOf[SInt]
+    O := I.t0b.asInstanceOf[SInt] === I.t1b.asInstanceOf[SInt]
   }
   else {
-    O := I.t0b.asUInt() < I.t1b.asUInt()
+    O := I.t0b.asUInt() === I.t1b.asUInt()
   }
   valid_down := valid_up
 }
